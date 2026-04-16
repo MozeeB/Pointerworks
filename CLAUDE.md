@@ -33,6 +33,16 @@ Full theme rationale in `THEME.md`. Full game flow in `docs/GAME_FLOW.md`.
 - Colors come from `scripts/util/color_palette.gd` — no hex literals in game code.
 - Checkboxes in `docs/PLAN.md`: `[ ]` pending, `[~]` in progress, `[x]` done.
 
+## Verification — non-negotiable
+
+Per `docs/PLAN.md` § "Verification Cadence":
+
+- **Per task (after every `.gd` / `.tscn` write):** Godot MCP `run_project` → `get_debug_output`. Fast editor parse check.
+- **Per commit + per EOD (Day 2 onward):** Claude Preview MCP on the web build. Since we ship HTML5, this is the authoritative test. Start with `preview_start` (config `pointerworks-web` in `.claude/launch.json`), then `preview_screenshot` + `preview_console_logs`. Save screenshot to `docs/preview-day-N.png`.
+- **Checkbox rule:** no `- [ ]` item flips to `- [x]` until the relevant run is clean. If anything errors, stays `- [~]`.
+- **Fallback if MCPs unavailable:** Godot headless CLI (`--check-only --path .`) for parse; real Chrome on `python3 -m http.server 8000` for web. Log `MCP unavailable — used fallback` in the DEVLOG `Verify:` bullet.
+- **`Verify:` bullet is mandatory** in every Day N DEVLOG entry (format example in the plan's EOD checklist).
+
 ## DO NOT
 
 - Add GPUParticles2D (GL Compatibility issues on web).

@@ -47,6 +47,7 @@
 
 - [🚀 FAST-RESUME](#-fast-resume-read-this-first-every-session) (above)
 - [🎯 Source of Truth](#-source-of-truth)
+- [🔬 Verification Cadence](#-verification-cadence--godot-mcp--claude-preview-are-non-negotiable) — Godot MCP per task + Claude Preview per day (HTML5 is the ship target)
 - [Context](#context) — jam details, game title, descriptions, target outcome
 - [Genre](#genre) — puzzle genre positioning, audience, tone
 - [Tags](#tags-canonical-list--copy-verbatim-to-itchio-github-topics-jam-form) — canonical tag list for itch, GitHub, jam form
@@ -89,6 +90,88 @@
 > - Repo copy (shipped + committed): `docs/PLAN.md` (created Day 1, synced every EOD + every mid-task checkpoint)
 >
 > The two must stay in sync. Treat `docs/PLAN.md` as read-only during a day's work; update it at EOD + at mid-task checkpoints alongside `DEVLOG.md`.
+
+> ## 🔬 Verification Cadence — Godot MCP + Claude Preview are non-negotiable
+>
+> **We ship HTML5**, so the authoritative test is the *web build* — and the cheapest way to drive that in-session is **Claude Preview MCP**. Godot MCP is the fast-path parse check between writes; Claude Preview is the daily *real* smoke on the thing judges will actually load.
+>
+> **Two-track cadence:**
+>
+> | Track | Tool | Purpose | Frequency |
+> |---|---|---|---|
+> | **Fast-path (per task)** | **Godot MCP** `run_project` + `get_debug_output` | Catch parse errors and runtime exceptions within seconds of a file write. Editor-only — tests the code, not the shipping target. | After every `.gd` / `.tscn` write |
+> | **Ship-path (per day, per commit)** | **Claude Preview MCP** on exported `build/index.html` | The real target: WASM boots, assets load, gameplay flows under browser runtime + localStorage + autoplay policy. | Daily EOD, and before every non-doc commit once a web build exists (≥ Day 2 EOD) |
+>
+> **Claude Preview is the default smoke test.** Screenshots, console logs, network tab, and scripted clicks all live in-session — no tab-switching, no manual browser launch for baseline checks.
+>
+> **`.claude/launch.json` (create at Day 2 EOD, when the first web build lands):**
+>
+> ```json
+> {
+>   "version": "0.0.1",
+>   "configurations": [
+>     {
+>       "name": "pointerworks-web",
+>       "runtimeExecutable": "python3",
+>       "runtimeArgs": ["-m", "http.server", "8000", "--directory", "build"],
+>       "port": 8000
+>     }
+>   ]
+> }
+> ```
+>
+> After that, `preview_start` with `name: "pointerworks-web"` boots the build on `http://127.0.0.1:8000/` and every preview tool (`preview_screenshot`, `preview_console_logs`, `preview_click`, `preview_eval`, `preview_network`, `preview_resize`) becomes available.
+>
+> **Mandatory calls by phase:**
+>
+> | When | Tool chain | What to capture |
+> |---|---|---|
+> | **After every file write** to `scripts/**/*.gd` or `scenes/**/*.tscn` | Godot MCP `run_project` → `get_debug_output` | Boot clean; zero `SCRIPT ERROR` / `Parse error` / `ERROR:` |
+> | **After any new part lands** | Godot MCP open `scenes/dev/part_test.tscn` → `get_debug_output` | Pre-existing smoke still works; no new warnings |
+> | **Every day's EOD (Day 2+)** | (a) Godot MCP `run_project` **AND** (b) export web build via headless CLI → `preview_start` → `preview_screenshot` → `preview_console_logs` | Web boot clean; screenshot saved to `docs/preview-day-N.png`; 2-line summary in `DEVLOG.md` |
+> | **Every day's EOD (Day 1 only — no web build yet)** | Godot MCP `run_project` + manual play of `scenes/dev/part_test.tscn` | Editor smoke clean |
+> | **Before any `git commit`** that isn't pure-doc | Same as the current phase (Day 1: Godot only; Day 2+: Godot + Preview) | Clean output |
+> | **Mid-task checkpoint** (Context-limit safety) | Godot MCP `run_project` | Result line into `In-progress > last test run` |
+> | **Day 4+ UX-gap features** | `preview_click` + `preview_eval` to script Tutorial → Level → Pause → Settings → Win flow | Confirm no console errors across the full flow |
+> | **Day 5 Ethereum** | `preview_network` (verify ethers.js CDN loads), `preview_eval` (`window.pointerworks.isConnected()`) | Wallet round-trip works without wallet installed (skip path) |
+> | **Day 7 pre-submit** | Full `preview_resize` trio: 1280×720, 1024×768 (judge laptop), 1920×1080 | Layout survives all three |
+>
+> **Checklist-item completion rule** (every `- [ ]` that modifies runtime code):
+>
+> > A checkbox only flips to `- [x]` when **all three** conditions are true:
+> > 1. Code is written + saved.
+> > 2. Godot MCP `run_project` booted with no parse / load errors.
+> > 3. `get_debug_output` (or `preview_console_logs` for web-only fixes) shows no new `ERROR` / `SCRIPT ERROR` / `Invalid` entries.
+> >
+> > Day 2+ additionally requires: Claude Preview `preview_start` + `preview_console_logs` clean once per commit boundary (not per file, to keep cycles fast).
+> >
+> > If any condition fails, the checkbox stays `- [~]` (in-progress) and the next action is fix — not move on.
+>
+> **Doc-only edits are exempt.** Updating `.md`, `CREDITS.md`, `DEVLOG.md`, `docs/PLAN.md` does not require any run.
+>
+> **Fallbacks** (use only when the MCP is genuinely unavailable — record in `In-progress > last test run`):
+>
+> - **Godot MCP down** → headless CLI:
+>   ```
+>   /Applications/Godot.app/Contents/MacOS/Godot --headless --check-only --path . 2>&1 | tail -40
+>   /Applications/Godot.app/Contents/MacOS/Godot --headless --quit-after 2 --path . 2>&1 | tail -40
+>   ```
+> - **Claude Preview down** → real-browser smoke in Chrome (`cd build && python3 -m http.server 8000` + manual open). Note: no scripted assertions, so this is strictly worse — re-enable Preview ASAP.
+>
+> **Daily EOD verification gate** (folded into the universal EOD checklist below — non-optional):
+>
+> - [ ] Godot MCP `run_project` on `scenes/main.tscn` — clean boot.
+> - [ ] Godot MCP `get_debug_output` — zero errors.
+> - [ ] **Day 2+:** Web export built; `preview_start` boots `pointerworks-web`; `preview_screenshot` saved to `docs/preview-day-N.png`; `preview_console_logs` zero errors.
+> - [ ] Manual smoke of the day's exit-gate behavior.
+> - [ ] `Verify:` bullet added to `DEVLOG.md` Day N entry (e.g., `Verify: Godot clean; Preview web build loads; 3/3 targets lit in part_test`).
+>
+> **Why this rule exists:** the jam target is `index.html` + `*.wasm` + `*.pck` running in a browser on a judge's laptop. Testing only in the Godot editor means a working editor build + broken web build = failed submission. Every day after Day 1 must end with proof the *web build* is green. Claude Preview makes that proof automatic and in-session.
+>
+> **Anti-patterns:**
+> - Writing 5 files in a row, then running Godot once at the end and getting a cryptic stack trace from file #3. *Correct:* write → run → verify → next file.
+> - Shipping a commit without running the web build post–Day 2. *Correct:* every commit that touches runtime code → Preview smoke.
+> - "It works in the editor" — not sufficient. The browser has different autoplay policies, `localStorage` quotas, WASM init timings. Web build is the only truth post–Day 2.
 
 ## Context
 
@@ -738,9 +821,14 @@ A shorter plan would ship these as "post-jam stretch" — with 7 days we fold th
 - [ ] **`scripts/autoload/audio_bus.gd`** with 8-player SFX pool + `default_bus_layout.tres` (Master/Music/SFX buses).
 - [ ] Connect SFX in each part's signal.
 - [ ] Update `LEVELS.md` + `DEVLOG.md` + `CLAUDE.md`.
-- [ ] Commit `feat: build phase + 4 levels + audio` + push.
+- [ ] **First web export + Claude Preview harness (Day 2 EOD milestone):**
+  - Configure Godot → Project → Export → Add Web (non-threads variant). Export With Debug OFF.
+  - Headless build: `/Applications/Godot.app/Contents/MacOS/Godot --headless --path . --export-release "Web" build/index.html`
+  - Create `.claude/launch.json` with the `pointerworks-web` config (see Verification Cadence section for JSON).
+  - `preview_start` → `preview_screenshot` → `preview_console_logs`. Save screenshot to `docs/preview-day-2.png`. Commit both `build/` (verify it's gitignored) and `.claude/launch.json` + screenshot.
+- [ ] Commit `feat: build phase + 4 levels + audio + web export harness` + push.
 
-**Exit gate Day 2:** 4 levels complete end-to-end in the editor run, palette works, audio plays, progress persists across scene reload.
+**Exit gate Day 2:** 4 levels complete end-to-end in the editor run, palette works, audio plays, progress persists across scene reload. **Verify via Claude Preview:** first web export built + `preview_start pointerworks-web` boots main menu; `preview_console_logs` zero errors; `docs/preview-day-2.png` committed.
 
 ### Day 3 — Apr 18 — 4 more levels + art polish + menus + music
 **Target hours:** 6-7. **End state:** feature-complete game, screenshot-ready.
@@ -769,7 +857,7 @@ A shorter plan would ship these as "post-jam stretch" — with 7 days we fold th
 - [ ] Update `DEVLOG.md` + `CLAUDE.md`.
 - [ ] Commit `feat: 8 levels + art polish + music + menus` + push.
 
-**Exit gate Day 3:** Loadable from main menu → pick a level → play it → win dialog → back. 8 levels all beatable. Screenshots look like a finished jam game.
+**Exit gate Day 3:** Loadable from main menu → pick a level → play it → win dialog → back. 8 levels all beatable. Screenshots look like a finished jam game. **Verify via Claude Preview:** scripted click path Main → L1 → Win via `preview_click`; `preview_screenshot` of RUN phase saved to `docs/preview-day-3.png`; `preview_console_logs` clean.
 
 ### Day 4 — Apr 19 — UX gap closure (tutorial, pause, settings, fail, blocker)
 **Target hours:** 6-7. **End state:** every UX gap item #1-8 from the audit is closed, game feels complete to a fresh player.
@@ -861,7 +949,7 @@ A shorter plan would ship these as "post-jam stretch" — with 7 days we fold th
 - [ ] **Fix P0 + P1** immediately. If fixes take >2 hr, spill remaining P1s to Day 7 morning.
 - [ ] Commit `fix: post-playtest P0+P1 + levels 9-10` + push.
 
-**Exit gate Day 6:** 10 levels beatable. Playtest report in `ISSUES.md`. Zero unresolved P0.
+**Exit gate Day 6:** 10 levels beatable. Playtest report in `ISSUES.md`. Zero unresolved P0. **Verify via Claude Preview:** save-corruption scenario scripted via `preview_eval` to poison `localStorage` → `preview_stop` + `preview_start` → toast confirms reset.
 
 ### Day 7 — Apr 22 — Web export + itch + SUBMIT
 **Target hours:** 5-6. **End state:** submitted with both side-challenge tickboxes checked.
@@ -911,13 +999,28 @@ A shorter plan would ship these as "post-jam stretch" — with 7 days we fold th
 **Exit gate Day 7:** Submission email received **before Apr 22 EOD**, leaving **4 days of buffer** until Apr 26 jam deadline for post-submission hotfixes from public playtest feedback.
 
 ### End-of-each-day universal checklist
-- [ ] `get_debug_output` has zero errors.
+- [ ] **Godot MCP `run_project`** on `scenes/main.tscn` — boots without errors. (If MCP unavailable: headless CLI fallback per Verification Cadence section.)
+- [ ] **Godot MCP `get_debug_output`** — zero `SCRIPT ERROR` / `ERROR:` / `Parse error` lines since project boot.
+- [ ] **Day 2+ only:** Export web build (headless CLI) → `preview_start` (`pointerworks-web` config from `.claude/launch.json`) → `preview_screenshot` saved to `docs/preview-day-N.png` → `preview_console_logs` zero errors. This is the authoritative HTML5 check.
+- [ ] **Manual smoke** of the day's exit gate (per each day's "Exit gate" line).
+- [ ] Add a `Verify:` bullet to the day's `DEVLOG.md` entry with Godot + Preview results (e.g., `Verify: Godot run_project clean; Preview web build loads, 3/3 targets lit in part_test.tscn; zero console errors`).
 - [ ] `git status` clean after commit.
 - [ ] `git push origin main` — remote matches local.
 - [ ] Add a 2-5 line `DEVLOG.md` entry: day, what shipped, what was cut, next blocker.
 - [ ] Update `CLAUDE.md` "current sprint day" line.
 - [ ] **Sync the plan (source of truth):** if anything changed materially (scope cut, risk realized, new gap found, tool swap), edit `~/.claude/plans/parallel-jingling-river.md` first, then `cp ~/.claude/plans/parallel-jingling-river.md docs/PLAN.md`. Commit both. Future sessions MUST read `docs/PLAN.md` first.
 - [ ] If anything slipped: move it to next day's top task, never silently drop.
+
+### Per-task verification (applies to every `[ ]` item that writes code)
+
+Before flipping a checkbox to `[x]`:
+
+1. **Godot MCP `run_project`** after the file write — confirm editor boot is clean (fast path, seconds).
+2. **`get_debug_output`** — no new `ERROR` / `SCRIPT ERROR` / `Invalid` entries vs. the pre-edit baseline.
+3. **Smoke test** the specific behavior just added (e.g., spawn a cursor after writing `Emitter.gd`; verify trail draws after writing `VirtualCursor.gd`).
+4. **Day 2+ only (commit-boundary, not per file):** after a group of related edits, rebuild the web export and run **Claude Preview** (`preview_start` → `preview_screenshot` → `preview_console_logs`). This is the HTML5 authoritative check — pass this before commit.
+
+If any step fails, the checkbox stays `[~]` and the next action is fix — not move on. See the "🔬 Verification Cadence" callout near the top of this plan for the full rule.
 
 ## Post-submission buffer (Apr 23-26, 4 days before jam deadline)
 
