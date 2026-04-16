@@ -1,10 +1,18 @@
-class_name ColorPalette
+class_name AppPalette
 extends RefCounted
-## ColorPalette — 6-color palette for all in-game art.
+## AppPalette — 6-color palette for all in-game art.
+##
+## Renamed from `AppPalette` because Godot 4 has a built-in
+## `AppPalette` resource type (used by ColorPicker presets) that wins
+## name resolution and hides this class's members. `AppPalette` is unique
+## to this project.
 ##
 ## No hex literals should appear in game code — always route through
-## `ColorPalette.get_color(name)` so the colorblind variant can swap
+## `AppPalette.get_color(swatch)` so the colorblind variant can swap
 ## amber → blue at runtime (Settings.colorblind_palette).
+##
+## NOTE: `Swatch` (not `Name`) — `Name` collides with a GDScript reserved
+## identifier used in node scope lookup and fails to parse.
 
 const BG_DARK := Color("#0E1320")
 const FG_LIGHT := Color("#F2F0E9")
@@ -17,7 +25,7 @@ const WALL_GREY := Color("#4A5060")
 const EMITTER_AMBER_CB := Color("#2E7AE8")
 
 
-enum Name {
+enum Swatch {
 	BG_DARK,
 	FG_LIGHT,
 	EMITTER_AMBER,
@@ -27,20 +35,20 @@ enum Name {
 }
 
 
-static func get_color(name: Name) -> Color:
+static func get_color(swatch: Swatch) -> Color:
 	var colorblind: bool = _is_colorblind_enabled()
-	match name:
-		Name.BG_DARK:
+	match swatch:
+		Swatch.BG_DARK:
 			return BG_DARK
-		Name.FG_LIGHT:
+		Swatch.FG_LIGHT:
 			return FG_LIGHT
-		Name.EMITTER_AMBER:
+		Swatch.EMITTER_AMBER:
 			return EMITTER_AMBER_CB if colorblind else EMITTER_AMBER
-		Name.CURSOR_MAGENTA:
+		Swatch.CURSOR_MAGENTA:
 			return CURSOR_MAGENTA
-		Name.TARGET_CYAN:
+		Swatch.TARGET_CYAN:
 			return TARGET_CYAN
-		Name.WALL_GREY:
+		Swatch.WALL_GREY:
 			return WALL_GREY
 	return FG_LIGHT
 

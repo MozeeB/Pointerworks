@@ -10,5 +10,10 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 - Bootstrapped: `project.godot` cleaned (3D stripped, 5 autoloads + 1280×720 display + GL Compatibility), full folder tree, 11 markdown docs, MIT LICENSE, `.gitignore`. Git init + first push to `MozeeB/Pointerworks` on `main` (commit `5fdedb7`).
 - Core mechanic built: `GridSystem` (64 px tiles, place/remove/clear API), `VirtualCursor` (Area2D + velocity + TTL + world-space Line2D trail + 4 death causes), `Part` base class (Area2D overlap dispatch), + 5 parts (Emitter with 0.15 s spawn cooldown, Wall / Target / Deflector / Splitter with fork-bomb guard).
 - 2-row smoke scene `scenes/dev/part_test.tscn` exercises straight-shot + split-and-deflect chains.
-- Verify: Godot MCP not yet available in this session; headless parse check was declined by user. Manual in-editor verify of `part_test.tscn` outstanding — carried into Day 2 morning as the first action. From Day 2 onward the plan mandates Godot MCP per task + Claude Preview per commit (HTML5 is the ship target). See `docs/PLAN.md` § "🔬 Verification Cadence".
-- Next (Day 2 morning): manual verify of Day 1 smoke scene → Speed Modifier + Teleporter; then phase FSM + palette drag-drop + 4 levels + first web export + Preview harness.
+- Verify: Godot MCP unavailable; used headless CLI fallback per plan. Headless boot surfaced 3 latent bugs fixed in-session:
+  1. `Web3Bridge.is_connected()` clashed with `Object.is_connected(signal, callable)` → renamed to `is_wallet_connected()`.
+  2. `ColorPalette` class_name clashed with Godot 4 built-in `ColorPalette` resource (ColorPicker presets) → renamed to `AppPalette`; all call sites updated.
+  3. Enum `Name` was a reserved-ish identifier causing parse errors → renamed to `Swatch`.
+- After fixes: `Godot --headless --quit-after 3` clean on both `scenes/main.tscn` and `scenes/dev/part_test.tscn`. Zero SCRIPT ERROR / ERROR output.
+- Interactive smoke (hover emitter → targets lit, splitter fork, wall kill) deferred to Day 2 EOD when web build + Claude Preview harness comes online.
+- Next (Day 2 morning): Speed Modifier + Teleporter → phase FSM + palette drag-drop + 4 levels → first web export + Preview harness (`.claude/launch.json`, `preview_screenshot` to `docs/preview-day-2.png`).

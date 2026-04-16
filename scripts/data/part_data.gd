@@ -24,7 +24,7 @@ enum Type {
 ## Teleporter: pair index (0 pairs with 0, 1 with 1, ...).
 @export var variant: int = 0
 ## Palette color override. Defaults to FG_LIGHT; subclasses pick their own.
-@export var palette_color: int = int(ColorPalette.Name.FG_LIGHT)
+@export var palette_color: int = int(AppPalette.Swatch.FG_LIGHT)
 
 
 ## Return a new PartData with a mutated rotation — never mutate in place.

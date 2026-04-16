@@ -16,7 +16,7 @@ signal wallet_error(message: String)
 var _address: String = ""
 
 
-func is_connected() -> bool:
+func is_wallet_connected() -> bool:
 	return _address != ""
 
 

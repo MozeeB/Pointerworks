@@ -30,7 +30,7 @@ var _alive: bool = true
 func _ready() -> void:
 	add_to_group(&"virtual_cursors")
 	_trail.top_level = true
-	_trail.default_color = ColorPalette.get_color(ColorPalette.Name.CURSOR_MAGENTA)
+	_trail.default_color = AppPalette.get_color(AppPalette.Swatch.CURSOR_MAGENTA)
 	_trail.width = 3.0
 	_trail.joint_mode = Line2D.LINE_JOINT_ROUND
 	# Gradient fades trail tail to transparent.
