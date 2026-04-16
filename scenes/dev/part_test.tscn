@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dpointerworksparttest"]
+[gd_scene load_steps=9 format=3 uid="uid://dpointerworksparttest"]
 
 [ext_resource type="Script" path="res://scripts/level/grid_system.gd" id="1_grid"]
 [ext_resource type="PackedScene" uid="uid://dpointerworksemitter" path="res://scenes/parts/emitter.tscn" id="2_emitter"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://dpointerworkswall" path="res://scenes/parts/wall.tscn" id="4_wall"]
 [ext_resource type="PackedScene" uid="uid://dpointerworksdeflector" path="res://scenes/parts/deflector.tscn" id="5_deflector"]
 [ext_resource type="PackedScene" uid="uid://dpointerworkssplitter" path="res://scenes/parts/splitter.tscn" id="6_splitter"]
+[ext_resource type="PackedScene" uid="uid://dpointerworksspeedmod" path="res://scenes/parts/speed_mod.tscn" id="7_speedmod"]
+[ext_resource type="PackedScene" uid="uid://dpointerworksteleporter" path="res://scenes/parts/teleporter.tscn" id="8_teleporter"]
 
 [node name="PartTest" type="Node2D"]
 
@@ -48,13 +50,32 @@ position = Vector2(800, 288)
 [node name="TargetDown" parent="PartsContainer" instance=ExtResource("3_target")]
 position = Vector2(800, 544)
 
+[node name="EmitterC" parent="PartsContainer" instance=ExtResource("2_emitter")]
+position = Vector2(96, 640)
+
+[node name="SpeedFast" parent="PartsContainer" instance=ExtResource("7_speedmod")]
+position = Vector2(320, 640)
+factor = 2.0
+
+[node name="TeleporterA" parent="PartsContainer" instance=ExtResource("8_teleporter")]
+position = Vector2(544, 640)
+pair_id = 1
+
+[node name="TeleporterB" parent="PartsContainer" instance=ExtResource("8_teleporter")]
+position = Vector2(800, 640)
+pair_id = 1
+
+[node name="TargetC" parent="PartsContainer" instance=ExtResource("3_target")]
+position = Vector2(1088, 640)
+
 [node name="Hint" type="Label" parent="."]
 offset_left = 32.0
-offset_top = 24.0
-offset_right = 1200.0
-offset_bottom = 120.0
+offset_top = 16.0
+offset_right = 1240.0
+offset_bottom = 136.0
 theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
 theme_override_font_sizes/font_size = 16
-text = "Row 1 (y=160): hover EmitterA → straight line → TargetA. Wall below path is harmless unless crossed.
-Row 2 (y=416): hover EmitterB → hits Splitter → spawns UP+DOWN cursors → each deflector turns them right → two Targets lit.
-Close the window when done. (Day 1 smoke test)"
+text = "Row 1 (y=160): EmitterA → straight → TargetA. Wall below path inert.
+Row 2 (y=416): EmitterB → Splitter forks UP/DOWN → Deflectors turn right → TargetUp + TargetDown.
+Row 3 (y=640): EmitterC → SpeedFast (×2) → TeleporterA → TeleporterB → TargetC.
+(Day 1–2 smoke; hover each emitter to verify.)"

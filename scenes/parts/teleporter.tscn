@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://dpointerworksteleporter"]
+
+[ext_resource type="Script" path="res://scripts/parts/teleporter.gd" id="1_teleporter"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_teleporter"]
+size = Vector2(48, 48)
+
+[node name="Teleporter" type="Area2D"]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_teleporter")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_teleporter")
+
+[node name="OuterRing" type="Polygon2D" parent="."]
+color = Color(0.8509, 0.2745, 0.7019, 1)
+polygon = PackedVector2Array(-26, -26, 26, -26, 26, 26, -26, 26)
+
+[node name="InnerHole" type="Polygon2D" parent="."]
+color = Color(0.0549, 0.0745, 0.1255, 1)
+polygon = PackedVector2Array(-18, -18, 18, -18, 18, 18, -18, 18)
+
+[node name="Swirl1" type="Polygon2D" parent="."]
+color = Color(0.8509, 0.2745, 0.7019, 1)
+polygon = PackedVector2Array(-12, -2, -2, -12, 2, -12, 12, 2, 2, 12, -2, 12)
+
+[node name="Swirl2" type="Polygon2D" parent="."]
+color = Color(0.8509, 0.2745, 0.7019, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 4, 4, -4, 4)

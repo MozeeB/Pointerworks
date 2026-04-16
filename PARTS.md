@@ -32,16 +32,27 @@ The 7 parts that make up every machine. Each part is 64 × 64 px, placed on a gr
 | Target | Day 1 — script + scene ✓ | `scripts/parts/target.gd`, `scenes/parts/target.tscn` |
 | Deflector | Day 1 — script + scene ✓ | `scripts/parts/deflector.gd`, `scenes/parts/deflector.tscn` |
 | Splitter | Day 1 — script + scene ✓ | `scripts/parts/splitter.gd`, `scenes/parts/splitter.tscn` |
-| Speed Modifier | Day 2 — pending | `scripts/parts/speed_mod.gd` |
-| Teleporter | Day 2 — pending | `scripts/parts/teleporter.gd` |
+| Speed Modifier | Day 2 AM — script + scene ✓ | `scripts/parts/speed_mod.gd`, `scenes/parts/speed_mod.tscn` |
+| Teleporter | Day 2 AM — script + scene ✓ | `scripts/parts/teleporter.gd`, `scenes/parts/teleporter.tscn` |
 
 Updated as each part lands during Days 1-2.
 
 ## Day 1 smoke scene
 
-`scenes/dev/part_test.tscn` exercises all 5 Day 1 parts:
+`scenes/dev/part_test.tscn` exercises all 7 parts:
 
 - **Row 1 (y=160):** EmitterA → straight-line → TargetA. WallA below path is inert until crossed.
 - **Row 2 (y=416):** EmitterB → Splitter forks UP and DOWN → DeflectorUp (steps=0) turns UP→RIGHT → TargetUp; DeflectorDown (steps=2 / node rot=π) turns DOWN→RIGHT → TargetDown.
+- **Row 3 (y=640):** EmitterC → SpeedFast (×2 velocity) → TeleporterA (pair_id=1) → TeleporterB (pair_id=1) → TargetC.
 
-Hovering each emitter with the real OS cursor should light up every target. The fork-bomb guard in `Splitter` + 36 px spawn offset prevents runaway cursor counts when cursors spawn inside the splitter's Area2D.
+Hovering each emitter with the real OS cursor should light up every target. Fork-bomb guard (`Splitter.MAX_LIVE_CURSORS=64`) + 36 px spawn offset on both Splitter and Teleporter prevents runaway cursor counts + ping-pong re-entry.
+
+## Parse + boot verification (Day 2 AM)
+
+Godot MCP unavailable this session → plan's CLI fallback used:
+
+```
+Godot --headless --quit-after 3 --path . res://scenes/dev/part_test.tscn
+```
+
+Output: clean boot, only UID warnings (synthetic UIDs fall back to file paths; harmless). Zero SCRIPT ERROR / Parse error. Interactive smoke (real mouse hover) awaits Day 2 EOD web export + Claude Preview.
