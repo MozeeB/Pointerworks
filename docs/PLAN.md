@@ -10,19 +10,20 @@
 > ┌─────────────────────────────────────────────────────┐
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
-> │ Today's date:          2026-04-16                   │
-> │ Current day:           Day 1 of 7 — COMPLETE        │
-> │ Last completed:        Day 1 EOD — 5 parts +        │
-> │                        GridSystem + VirtualCursor + │
-> │                        dev test scene shipped       │
-> │ Next action:           Day 2 morning — Speed Mod +  │
-> │                        Teleporter, then phase FSM + │
-> │                        palette + 4 levels           │
-> │ In-progress (if any):  (none — end of Day 1)        │
-> │   └─ last file touched: scripts/parts/splitter.gd   │
-> │   └─ last test run:     manual verify pending       │
-> │ Blockers:              None                         │
-> │ Last commit:            5fdedb7 (+ Day 1 EOD pending)│
+> │ Today's date:          2026-04-17                   │
+> │ Current day:           Day 2 of 7 — COMPLETE        │
+> │ Last completed:        Day 2 EOD — first web export,│
+> │                        Preview harness green, 4     │
+> │                        levels playable via HUD      │
+> │ Next action:           Day 3 morning — levels 5-8 + │
+> │                        grid/target shaders + music  │
+> │                        + Figma main-menu polish     │
+> │ In-progress (if any):  (none — end of Day 2)        │
+> │   └─ last file touched: DEVLOG.md                   │
+> │   └─ last test run:     Preview clean; 0 err logs   │
+> │ Blockers:              None (bundle size to check   │
+> │                        at D7: 36MB wasm raw → gzip) │
+> │ Last commit:            bd2e615                     │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │
