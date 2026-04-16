@@ -148,3 +148,20 @@ text = "Next"
 custom_minimum_size = Vector2(100, 48)
 layout_mode = 2
 text = "Menu"
+
+[node name="FailBanner" type="PanelContainer" parent="."]
+visible = false
+custom_minimum_size = Vector2(460, 80)
+offset_left = 410.0
+offset_top = 200.0
+offset_right = 870.0
+offset_bottom = 280.0
+
+[node name="Label" type="Label" parent="FailBanner"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.3, 0.3, 1)
+theme_override_font_sizes/font_size = 22
+text = "Machine stalled — 1 target unfed."
+horizontal_alignment = 1
+vertical_alignment = 1
+

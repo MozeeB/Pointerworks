@@ -4,6 +4,20 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 4 — 2026-04-17
+
+- **Gap audit items #1-8 closed.** FailChecker (`scripts/level/fail_checker.gd`) polls `virtual_cursors` group during RUN; after grace ticks, if all cursors dead + any target unhit, emits `level_failed(missed_targets)`. Level auto-returns to BUILD after 2 s. HUD gains `FailBanner` (`Machine stalled — N targets unfed.`) with Tween fade.
+- PauseMenu (`scenes/ui/pause_menu.tscn`) — Resume / Restart / Settings / Back-to-Menu, `process_mode = ALWAYS`, `get_tree().paused = true` while visible.
+- SettingsDialog (`scenes/ui/settings_dialog.tscn`) — Master / Music / SFX HSliders, Fullscreen + Colorblind CheckButtons; wired through `Settings.set_*` typed setters so side-effects fire (AudioServer bus volume, DisplayServer mode, settings_changed signal).
+- TutorialOverlay (`scenes/ui/tutorial_overlay.tscn`) — on-theme mechanic intro + shortcuts row + Got it button. MainMenu._ready spawns it when `Progress.seen_tutorial == false`. Dismiss persists the flag.
+- DesktopOnlyBlocker (`scenes/ui/desktop_only_blocker.tscn`) — MainMenu pre-checks via `OS.has_feature("mobile"/"android"/"ios")` and `DisplayServer.is_touchscreen_available()`; blocker overrides the menu if true.
+- InputMap actions (`project.godot`): `pw_pause` (Esc), `pw_run_toggle` (Space), `pw_rotate` (R), `pw_fullscreen` (F11). Level `_unhandled_input` routes them.
+- Main Menu now has Credits button + jam tag + subtitle.
+- Verify: Godot headless clean on main / level. Web re-exported. **Claude Preview first-run → TutorialOverlay opens with full mechanic blurb + shortcuts; Got it dismisses → Main Menu; second reload shows no tutorial (Progress persisted correctly). Zero console errors.**
+- Next (Day 5): Ethereum challenge — Foundry + Solidity `PointerworksAchievements` on Sepolia + ethers.js v6 bridge via `JavaScriptBridge` + optional Connect Wallet button. Must remain 100% skippable.
+
+---
+
 ## Day 3 — 2026-04-17
 
 - Shipped AM: levels 5-8 as .gd builders — l05 Lathe (SpeedMod ×2), l06 Kiln (SpeedMod ×0.5 + Deflector), l07 Foundry (Teleporter pair), l08 Assembly (all 7 parts in one machine: emitter → speed → splitter → up-branch (deflector + teleporter across grid) + down-branch (deflector + slow) → two targets). `level_select` unlock cap raised to 8.

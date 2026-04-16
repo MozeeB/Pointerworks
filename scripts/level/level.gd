@@ -7,8 +7,13 @@ extends Node2D
 ## LevelLoader on `_ready` (level_id set by SceneSwitcher prior to load).
 
 const DEFAULT_LEVEL: String = "l01"
+const PAUSE_SCENE := preload("res://scenes/ui/pause_menu.tscn")
+const SETTINGS_SCENE := preload("res://scenes/ui/settings_dialog.tscn")
 
 @export var level_resource: LevelResource
+
+var _pause_menu: CanvasLayer = null
+var _settings_dialog: CanvasLayer = null
 
 
 static func _load_level_by_id(id: String) -> LevelResource:
@@ -28,6 +33,7 @@ static func _load_level_by_id(id: String) -> LevelResource:
 @onready var _container: Node2D = $PartsContainer
 @onready var _phase: PhaseController = $PhaseController
 @onready var _win: WinChecker = $WinChecker
+@onready var _fail: FailChecker = $FailChecker if has_node("FailChecker") else null
 @onready var _hud: CanvasLayer = $HUD
 
 var _spawned_parts: Array[Part] = []
@@ -62,6 +68,48 @@ func _ready() -> void:
 	_wire_hud()
 	_wire_phase()
 	_wire_emitters()
+	_spawn_modals()
+
+
+func _spawn_modals() -> void:
+	_pause_menu = PAUSE_SCENE.instantiate()
+	add_child(_pause_menu)
+	_pause_menu.resume_pressed.connect(func(): pass)
+	_pause_menu.restart_pressed.connect(func():
+		_pause_menu.hide_menu()
+		_phase.to_build()
+	)
+	_pause_menu.settings_pressed.connect(_open_settings)
+	_pause_menu.back_pressed.connect(func():
+		_pause_menu.hide_menu()
+		_on_back_pressed()
+	)
+
+	_settings_dialog = SETTINGS_SCENE.instantiate()
+	add_child(_settings_dialog)
+	_settings_dialog.closed.connect(func(): pass)
+
+
+func _open_settings() -> void:
+	if _settings_dialog != null:
+		_settings_dialog.call(&"open")
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed(&"pw_pause"):
+		if _pause_menu != null:
+			_pause_menu.toggle()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"pw_run_toggle"):
+		_phase.toggle_build_run()
+		get_viewport().set_input_as_handled()
+	elif event.is_action_pressed(&"pw_fullscreen"):
+		var cur := DisplayServer.window_get_mode()
+		if cur == DisplayServer.WINDOW_MODE_FULLSCREEN:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		get_viewport().set_input_as_handled()
 
 
 func _wire_hud() -> void:
@@ -82,6 +130,8 @@ func _wire_hud() -> void:
 func _wire_phase() -> void:
 	_phase.phase_changed.connect(_on_phase_changed)
 	_win.level_complete.connect(_on_level_complete)
+	if _fail != null:
+		_fail.level_failed.connect(_on_level_failed)
 
 
 func _wire_emitters() -> void:
@@ -102,12 +152,20 @@ func _on_phase_changed(phase: int) -> void:
 			_despawn_live_cursors()
 			_reset_targets()
 			_win.disarm()
+			if _fail != null:
+				_fail.disarm()
 		PhaseController.Phase.RUN:
 			_win.arm()
+			if _fail != null:
+				_fail.arm()
 		PhaseController.Phase.WIN:
 			_despawn_live_cursors()
+			if _fail != null:
+				_fail.disarm()
 		PhaseController.Phase.FAIL:
 			_despawn_live_cursors()
+			if _fail != null:
+				_fail.disarm()
 
 
 func _on_run_pressed() -> void:
@@ -138,6 +196,23 @@ func _on_next_pressed() -> void:
 
 func _on_retry_pressed() -> void:
 	_phase.to_build()
+
+
+func _on_level_failed(missed_targets: int) -> void:
+	_phase.to_fail()
+	if _hud.has_method(&"show_fail"):
+		_hud.call(&"show_fail", missed_targets)
+	# Auto-return to BUILD after a brief fail banner.
+	var t := get_tree().create_timer(2.0)
+	t.timeout.connect(_auto_back_to_build)
+
+
+func _auto_back_to_build() -> void:
+	# Safe: only pivot if we're still on the FAIL screen.
+	if _phase.is_fail():
+		_phase.to_build()
+		if _hud.has_method(&"hide_fail"):
+			_hud.call(&"hide_fail")
 
 
 func _on_level_complete(cursors_used: int) -> void:

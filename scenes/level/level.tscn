@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://dpointerworkslevel"]
+[gd_scene load_steps=9 format=3 uid="uid://dpointerworkslevel"]
 
 [ext_resource type="Script" path="res://scripts/level/level.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/level/grid_system.gd" id="2_grid"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/level/win_checker.gd" id="4_win"]
 [ext_resource type="PackedScene" uid="uid://dpointerworkshud" path="res://scenes/ui/hud.tscn" id="5_hud"]
 [ext_resource type="Shader" path="res://shaders/grid_glow.gdshader" id="6_gridglow"]
+[ext_resource type="Script" path="res://scripts/level/fail_checker.gd" id="7_fail"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 shader = ExtResource("6_gridglow")
@@ -39,5 +40,8 @@ script = ExtResource("3_phase")
 
 [node name="WinChecker" type="Node" parent="."]
 script = ExtResource("4_win")
+
+[node name="FailChecker" type="Node" parent="."]
+script = ExtResource("7_fail")
 
 [node name="HUD" parent="." instance=ExtResource("5_hud")]

@@ -24,6 +24,8 @@ signal retry_pressed
 @onready var _next_btn: Button = $WinPanel/VBox/ButtonRow/NextButton
 @onready var _retry_btn: Button = $WinPanel/VBox/ButtonRow/RetryButton
 @onready var _menu_btn: Button = $WinPanel/VBox/ButtonRow/MenuButton
+@onready var _fail_banner: PanelContainer = $FailBanner if has_node("FailBanner") else null
+@onready var _fail_label: Label = $FailBanner/Label if has_node("FailBanner/Label") else null
 
 
 func _ready() -> void:
@@ -124,3 +126,23 @@ func _on_retry() -> void:
 	_win_panel.modulate = Color(1, 1, 1, 0)
 	_win_panel.hide()
 	retry_pressed.emit()
+
+
+## Fail banner — fades in, auto-hidden by Level after 2 s.
+func show_fail(missed: int) -> void:
+	if _fail_banner == null:
+		return
+	if _fail_label != null:
+		_fail_label.text = "Machine stalled — %d target%s unfed." % [missed, "" if missed == 1 else "s"]
+	_fail_banner.show()
+	_fail_banner.modulate = Color(1, 1, 1, 0)
+	var tween := create_tween()
+	tween.tween_property(_fail_banner, "modulate:a", 1.0, 0.25)
+
+
+func hide_fail() -> void:
+	if _fail_banner == null:
+		return
+	var tween := create_tween()
+	tween.tween_property(_fail_banner, "modulate:a", 0.0, 0.2)
+	tween.tween_callback(_fail_banner.hide)

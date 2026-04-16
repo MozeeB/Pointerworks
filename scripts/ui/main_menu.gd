@@ -4,16 +4,40 @@ extends Control
 ## Stub for Day 1. Day 3 adds full Figma-designed layout. Day 4 adds
 ## Settings button wiring. Day 5 adds optional "Connect Wallet".
 
+const DESKTOP_BLOCKER_SCENE := preload("res://scenes/ui/desktop_only_blocker.tscn")
+const TUTORIAL_SCENE := preload("res://scenes/ui/tutorial_overlay.tscn")
+
 @onready var _play_button: Button = $CenterContainer/VBoxContainer/PlayButton
 @onready var _credits_button: Button = $CenterContainer/VBoxContainer/CreditsButton
 @onready var _title_label: Label = $CenterContainer/VBoxContainer/TitleLabel
 
 
 func _ready() -> void:
+	if _check_mobile_blocker():
+		return
 	_play_button.pressed.connect(_on_play_pressed)
 	if _credits_button != null:
 		_credits_button.pressed.connect(_on_credits_pressed)
 	_start_title_idle()
+	_maybe_show_tutorial()
+
+
+func _check_mobile_blocker() -> bool:
+	# Import the class script so the static is reachable.
+	var scr := preload("res://scripts/ui/desktop_only_blocker.gd")
+	if scr != null and scr.is_mobile_device():
+		add_child(DESKTOP_BLOCKER_SCENE.instantiate())
+		return true
+	return false
+
+
+func _maybe_show_tutorial() -> void:
+	var progress := get_node_or_null(^"/root/Progress")
+	if progress == null:
+		return
+	if progress.get(&"seen_tutorial") == true:
+		return
+	add_child(TUTORIAL_SCENE.instantiate())
 
 
 func _on_play_pressed() -> void:

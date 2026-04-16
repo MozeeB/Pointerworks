@@ -11,20 +11,22 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-17                   │
-> │ Current day:           Day 3 of 7 — COMPLETE        │
-> │ Last completed:        Day 3 EOD — levels 5-8 +     │
-> │                        shaders + Tween polish +     │
-> │                        Credits scene                │
-> │ Next action:           Day 4 morning — FAIL state + │
-> │                        Pause + Settings + Tutorial  │
-> │                        + Desktop blocker + shortcuts│
-> │ In-progress (if any):  (none — end of Day 3)        │
+> │ Current day:           Day 4 of 7 — COMPLETE        │
+> │ Last completed:        Day 4 EOD — gap items #1-8:  │
+> │                        Fail, Pause, Settings,       │
+> │                        Tutorial, Desktop blocker,   │
+> │                        InputMap shortcuts           │
+> │ Next action:           Day 5 — Ethereum challenge   │
+> │                        (Foundry + Sepolia + ethers  │
+> │                        + Connect Wallet, skippable) │
+> │ In-progress (if any):  (none — end of Day 4)        │
 > │   └─ last file touched: DEVLOG.md                   │
-> │   └─ last test run:     Preview: grid_glow shader   │
-> │                        rendering; 0 console errors  │
-> │ Blockers:              Music deferred; bundle gzip  │
-> │                        check deferred to Day 7      │
-> │ Last commit:            (pending Day 3 EOD)         │
+> │   └─ last test run:     Preview tutorial fires on   │
+> │                        first-run, dismisses, stays  │
+> │                        dismissed on reload; 0 err   │
+> │ Blockers:              Music + colorblind live-swap │
+> │                        deferred; bundle gzip at D7  │
+> │ Last commit:            (pending Day 4 EOD)         │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │
