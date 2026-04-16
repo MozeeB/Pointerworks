@@ -26,6 +26,11 @@ signal retry_pressed
 @onready var _menu_btn: Button = $WinPanel/VBox/ButtonRow/MenuButton
 @onready var _fail_banner: PanelContainer = $FailBanner if has_node("FailBanner") else null
 @onready var _fail_label: Label = $FailBanner/Label if has_node("FailBanner/Label") else null
+@onready var _onchain_btn: Button = $WinPanel/VBox/OnChainRow/OnChainButton if has_node("WinPanel/VBox/OnChainRow/OnChainButton") else null
+@onready var _onchain_status: Label = $WinPanel/VBox/OnChainRow/OnChainStatus if has_node("WinPanel/VBox/OnChainRow/OnChainStatus") else null
+
+
+signal submit_on_chain_pressed
 
 
 func _ready() -> void:
@@ -34,9 +39,30 @@ func _ready() -> void:
 	_next_btn.pressed.connect(func(): next_pressed.emit())
 	_retry_btn.pressed.connect(_on_retry)
 	_menu_btn.pressed.connect(func(): back_pressed.emit())
+	if _onchain_btn != null:
+		_onchain_btn.pressed.connect(func():
+			submit_on_chain_pressed.emit()
+			if _onchain_status != null:
+				_onchain_status.text = "submitting…"
+			_onchain_btn.disabled = true
+		)
 	_win_panel.hide()
 	_win_panel.modulate = Color(1, 1, 1, 0)
 	_set_run_label(false)
+
+
+func set_onchain_available(available: bool) -> void:
+	if _onchain_btn == null:
+		return
+	_onchain_btn.visible = available
+	_onchain_btn.disabled = false
+	if _onchain_status != null:
+		_onchain_status.text = ""
+
+
+func set_onchain_status(text: String) -> void:
+	if _onchain_status != null:
+		_onchain_status.text = text
 
 
 func set_level_title(title: String) -> void:

@@ -4,6 +4,21 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 5 — 2026-04-17
+
+- **Ethereum challenge plumbing shipped (skippable by design).**
+- Solidity contract: `contracts/src/PointerworksAchievements.sol`. `completeLevel(uint8 levelId, bytes32 hash)` with per-player bitmap + first-solution hash storage + `LevelCompleted` event. Idempotent replays; `InvalidLevel` revert for levelId ≥ 10. View helpers `hasCompleted` + `completedCount`.
+- Forge tests: `contracts/test/PointerworksAchievements.t.sol` — 4 tests covering basic complete, idempotency, invalid revert, multi-level accumulate. Foundry project + Deploy.s.sol + `.env.example` ship for user deploy.
+- JS glue: `scripts/web3/ethers_glue.js` — lazy-loads ethers v6 from jsdelivr CDN on first `connect()`. Exposes `window.pointerworks.{connect,disconnect,isConnected,getAddress,completeLevel}`. Gracefully errors if no wallet.
+- `scripts/autoload/web3_bridge.gd` rewritten — replaces Day 1 stub with full JavaScriptBridge integration. Boots the glue via `FileAccess.open(GLUE_PATH).get_as_text()` + `JavaScriptBridge.eval()`. Polls `window.__pw_connect_result` / `__pw_tx_result` via timer; emits `wallet_connected`, `tx_pending`, `tx_confirmed`, `wallet_error` signals. `is_wallet_connected` / `get_address` / `complete_level` / `connect_wallet` / `disconnect_wallet` public API.
+- Main menu gains `Connect Wallet (optional)` button (hidden on non-web). Short-address display once connected. HUD WinPanel gains `Submit on-chain` button that shows only when wallet connected; `Level._on_submit_on_chain` computes deterministic `sha256(levelId + placements)` hash, calls `Web3Bridge.complete_level(levelIndex, 0x…)`.
+- Export preset `include_filter="*.js"` added so the glue ships inside the web PCK. Verified via `preview_eval`: `window.pointerworks` exposes the expected `object` on reload.
+- Verify: headless parse clean (two GDScript multi-line grouping bugs fixed — GDScript does not auto-concat parenthesized string literals, needs explicit `+`). Re-exported web build; Claude Preview confirms Connect Wallet button renders on main menu. `typeof window.pointerworks === 'object'` + `window.POINTERWORKS_CONTRACT === 0x000…000` confirmed via preview_eval.
+- Non-blocking TODO: bundle still 36 MB wasm raw (gzip at D7); contract not deployed (user self-serve per README). Local Progress still marks complete regardless of TX; gameplay unaffected.
+- Next (Day 6): robustness (save corruption handling + LevelLoadErrorDialog) + playtest + levels 9-10 (Reactor + Cyclotron).
+
+---
+
 ## Day 4 — 2026-04-17
 
 - **Gap audit items #1-8 closed.** FailChecker (`scripts/level/fail_checker.gd`) polls `virtual_cursors` group during RUN; after grace ticks, if all cursors dead + any target unhit, emits `level_failed(missed_targets)`. Level auto-returns to BUILD after 2 s. HUD gains `FailBanner` (`Machine stalled — N targets unfed.`) with Tween fade.

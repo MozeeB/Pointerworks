@@ -63,6 +63,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 16
 text = "Credits"
 
+[node name="ConnectWalletButton" type="Button" parent="CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(280, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Connect Wallet (optional)"
+
 [node name="HintLabel" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.65, 1)

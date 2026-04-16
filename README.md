@@ -42,7 +42,40 @@ All project context lives in `docs/PLAN.md` — the single source of truth for s
 ## Side challenges
 
 - **Open Source** — MIT licensed, public repo.
-- **Ethereum** — Optional Sepolia on-chain level completions via MetaMask. Contract address: _(added on Day 5)_.
+- **Ethereum** — Optional Sepolia on-chain level completions via MetaMask. 100% skippable; the game plays fully without a wallet.
+
+### Ethereum — deploy your own contract (optional)
+
+The contract and JS bridge ship with the source. To wire up a live deploy:
+
+```bash
+# 1. Install Foundry
+curl -L https://foundry.paradigm.xyz | bash && foundryup
+
+# 2. Set up .env (NEVER commit this)
+cp .env.example .env
+# Fill in SEPOLIA_RPC (https://alchemy.com free tier), DEPLOYER_KEY
+# (throwaway wallet, fund ~0.05 SepETH via https://sepoliafaucet.com),
+# and ETHERSCAN_KEY (https://etherscan.io/apis).
+
+# 3. Test + deploy
+set -a && . .env && set +a
+cd contracts
+forge test
+forge script script/Deploy.s.sol --rpc-url $SEPOLIA_RPC --broadcast
+
+# 4. Paste the deployed address into .env as POINTERWORKS_CONTRACT,
+#    then either:
+#    (a) Edit scripts/autoload/web3_bridge.gd DEFAULT_CONTRACT_ADDRESS, OR
+#    (b) Append to build/index.html before <script src=index.js>:
+#        <script>window.POINTERWORKS_CONTRACT='0xYourAddress'</script>
+
+# 5. Verify on Etherscan (optional)
+forge verify-contract <addr> src/PointerworksAchievements.sol:PointerworksAchievements \
+  --chain sepolia --etherscan-api-key $ETHERSCAN_KEY
+```
+
+Players without MetaMask see a "Connect Wallet (optional)" button that's a no-op — they finish every level with zero crypto friction. With MetaMask connected + a deployed contract, the win dialog gains a "Submit on-chain" button that records `LevelCompleted(address, levelId, hash, timestamp)`.
 
 ## License
 

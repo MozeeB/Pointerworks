@@ -149,6 +149,23 @@ custom_minimum_size = Vector2(100, 48)
 layout_mode = 2
 text = "Menu"
 
+[node name="OnChainRow" type="HBoxContainer" parent="WinPanel/VBox"]
+layout_mode = 2
+alignment = 1
+
+[node name="OnChainButton" type="Button" parent="WinPanel/VBox/OnChainRow"]
+visible = false
+custom_minimum_size = Vector2(260, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Submit on-chain"
+
+[node name="OnChainStatus" type="Label" parent="WinPanel/VBox/OnChainRow"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.58, 0.65, 1)
+theme_override_font_sizes/font_size = 12
+text = ""
+
 [node name="FailBanner" type="PanelContainer" parent="."]
 visible = false
 custom_minimum_size = Vector2(460, 80)

@@ -125,6 +125,67 @@ func _wire_hud() -> void:
 		_hud.connect(&"next_pressed", _on_next_pressed)
 	if _hud.has_signal(&"retry_pressed"):
 		_hud.connect(&"retry_pressed", _on_retry_pressed)
+	if _hud.has_signal(&"submit_on_chain_pressed"):
+		_hud.connect(&"submit_on_chain_pressed", _on_submit_on_chain)
+	_wire_web3()
+
+
+func _wire_web3() -> void:
+	var w := get_node_or_null(^"/root/Web3Bridge")
+	if w == null:
+		return
+	w.wallet_connected.connect(func(_a): _refresh_onchain_button())
+	w.wallet_disconnected.connect(func(): _refresh_onchain_button())
+	w.tx_pending.connect(func(h):
+		if _hud.has_method(&"set_onchain_status"):
+			_hud.call(&"set_onchain_status", "tx: " + h.substr(0, 10) + "…")
+	)
+	w.wallet_error.connect(func(msg):
+		if _hud.has_method(&"set_onchain_status"):
+			_hud.call(&"set_onchain_status", "error: " + msg)
+	)
+
+
+func _refresh_onchain_button() -> void:
+	var w := get_node_or_null(^"/root/Web3Bridge")
+	if w == null or not _hud.has_method(&"set_onchain_available"):
+		return
+	_hud.call(&"set_onchain_available", bool(w.call(&"is_wallet_connected")))
+
+
+func _on_submit_on_chain() -> void:
+	var w := get_node_or_null(^"/root/Web3Bridge")
+	if w == null or level_resource == null:
+		return
+	var level_index: int = _level_index_from_id(level_resource.id)
+	if level_index < 0:
+		return
+	var hash: String = _solution_hash_hex()
+	w.call(&"complete_level", level_index, hash)
+
+
+func _level_index_from_id(id: String) -> int:
+	if not id.begins_with("l"):
+		return -1
+	var n := int(id.substr(1)) - 1
+	if n < 0 or n > 9:
+		return -1
+	return n
+
+
+## 32-byte deterministic solution hash. For now derived from level id +
+## placements; Day 6 hardening can include the real RNG seed.
+func _solution_hash_hex() -> String:
+	var buf: String = level_resource.id
+	for pp in level_resource.placements:
+		if pp == null or pp.data == null:
+			continue
+		buf += "|%d,%d,%d,%d,%d" % [pp.cell.x, pp.cell.y, int(pp.data.type), pp.data.rotation_steps, pp.data.variant]
+	var ctx := HashingContext.new()
+	ctx.start(HashingContext.HASH_SHA256)
+	ctx.update(buf.to_utf8_buffer())
+	var bytes: PackedByteArray = ctx.finish()
+	return "0x" + bytes.hex_encode()
 
 
 func _wire_phase() -> void:
@@ -222,6 +283,7 @@ func _on_level_complete(cursors_used: int) -> void:
 		progress.call(&"mark_completed", level_resource.id, cursors_used)
 	if _hud.has_method(&"show_win"):
 		_hud.call(&"show_win", cursors_used, level_resource.par_cursors)
+	_refresh_onchain_button()
 
 
 func _despawn_live_cursors() -> void:
