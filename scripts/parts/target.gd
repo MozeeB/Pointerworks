@@ -18,9 +18,11 @@ func _ready() -> void:
 	add_to_group(&"targets")
 
 
-func apply_to_cursor(cursor: VirtualCursor) -> void:
+func apply_to_cursor(_cursor: VirtualCursor) -> void:
+	# Cursor passes through — targets do NOT consume the cursor, so one
+	# cursor can light multiple targets in sequence (Theme: Forge level).
+	# Subsequent cursors overlapping an already-hit target are no-ops.
 	if _hit:
-		cursor.die(&"target_already_hit")
 		return
 	_hit = true
 	hit.emit()
@@ -28,11 +30,16 @@ func apply_to_cursor(cursor: VirtualCursor) -> void:
 	var audio := get_node_or_null(^"/root/AudioBus")
 	if audio != null:
 		audio.call(&"play_sfx", &"hit_target")
-	cursor.die(&"target_hit")
 
 
 func is_hit() -> bool:
 	return _hit
+
+
+func reset() -> void:
+	_hit = false
+	if _inner != null:
+		_inner.modulate = Color(1.0, 1.0, 1.0, 1.0)
 
 
 func _light_up() -> void:

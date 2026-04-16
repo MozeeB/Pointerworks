@@ -1,6 +1,13 @@
-[gd_scene format=3 uid="uid://dpointerworkslevel"]
+[gd_scene load_steps=6 format=3 uid="uid://dpointerworkslevel"]
+
+[ext_resource type="Script" path="res://scripts/level/level.gd" id="1_level"]
+[ext_resource type="Script" path="res://scripts/level/grid_system.gd" id="2_grid"]
+[ext_resource type="Script" path="res://scripts/level/phase_controller.gd" id="3_phase"]
+[ext_resource type="Script" path="res://scripts/level/win_checker.gd" id="4_win"]
+[ext_resource type="PackedScene" uid="uid://dpointerworkshud" path="res://scenes/ui/hud.tscn" id="5_hud"]
 
 [node name="Level" type="Node2D"]
+script = ExtResource("1_level")
 
 [node name="Background" type="ColorRect" parent="."]
 offset_right = 1280.0
@@ -8,11 +15,19 @@ offset_bottom = 720.0
 color = Color(0.0549, 0.0745, 0.1255, 1)
 
 [node name="Grid" type="Node2D" parent="."]
+position = Vector2(128, 56)
+script = ExtResource("2_grid")
 
 [node name="PartsContainer" type="Node2D" parent="."]
+position = Vector2(128, 56)
 
 [node name="CursorSystem" type="Node2D" parent="."]
+position = Vector2(128, 56)
 
 [node name="PhaseController" type="Node" parent="."]
+script = ExtResource("3_phase")
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="WinChecker" type="Node" parent="."]
+script = ExtResource("4_win")
+
+[node name="HUD" parent="." instance=ExtResource("5_hud")]

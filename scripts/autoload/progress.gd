@@ -13,8 +13,8 @@ const SAVE_PATH := "user://save.cfg"
 const CURRENT_VERSION := 1
 
 var seen_tutorial: bool = false
-var _completed: PackedInt32Array = PackedInt32Array()
-var _cursors_used: Dictionary = {}  # level_id (int) → cursors_used (int)
+var _completed: PackedStringArray = PackedStringArray()
+var _cursors_used: Dictionary = {}  # level_id (String) → cursors_used (int)
 
 
 func _ready() -> void:
@@ -36,7 +36,7 @@ func load_progress() -> void:
 		return
 	seen_tutorial = cfg.get_value("state", "seen_tutorial", false)
 	var completed_raw: Array = cfg.get_value("state", "completed", [])
-	_completed = PackedInt32Array(completed_raw)
+	_completed = PackedStringArray(completed_raw)
 	_cursors_used = cfg.get_value("state", "cursors_used", {})
 
 
@@ -51,7 +51,7 @@ func save_progress() -> void:
 		push_error("Progress: failed to save (err=%d)" % err)
 
 
-func mark_completed(level_id: int, cursors_used: int) -> void:
+func mark_completed(level_id: String, cursors_used: int) -> void:
 	if not is_completed(level_id):
 		_completed.append(level_id)
 	# Keep the best (lowest) cursors_used value — favour optimal play.
@@ -62,18 +62,23 @@ func mark_completed(level_id: int, cursors_used: int) -> void:
 	progress_changed.emit()
 
 
-func is_completed(level_id: int) -> bool:
+func is_completed(level_id: String) -> bool:
 	return _completed.has(level_id)
 
 
-func is_unlocked(level_id: int) -> bool:
+func is_unlocked(level_id: String) -> bool:
 	# Level 1 always unlocked; 2..N unlock when previous is completed.
-	if level_id <= 1:
+	if level_id == "l01":
 		return true
-	return is_completed(level_id - 1)
+	if not level_id.begins_with("l"):
+		return false
+	var n := int(level_id.substr(1))
+	if n <= 1:
+		return true
+	return is_completed("l%02d" % (n - 1))
 
 
-func cursors_used_for(level_id: int) -> int:
+func cursors_used_for(level_id: String) -> int:
 	return _cursors_used.get(level_id, -1)
 
 
@@ -86,6 +91,6 @@ func set_tutorial_seen() -> void:
 
 func _reset_to_defaults() -> void:
 	seen_tutorial = false
-	_completed = PackedInt32Array()
+	_completed = PackedStringArray()
 	_cursors_used = {}
 	progress_changed.emit()
