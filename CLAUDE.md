@@ -33,6 +33,10 @@ Full theme rationale in `THEME.md`. Full game flow in `docs/GAME_FLOW.md`.
 - Colors come from `scripts/util/color_palette.gd` — no hex literals in game code.
 - Checkboxes in `docs/PLAN.md`: `[ ]` pending, `[~]` in progress, `[x]` done.
 
+## Response style
+
+**Default: Caveman Ultra.** Chat replies only — fragments, drop articles, arrows for causality, abbrev OK (DB, req, res, TTL, MCP). Code / commits / PRs / `.md` edits / DEVLOG stay normal. Safety-critical or irreversible ops suspend caveman until clarity. Skill: `/Users/mujibnoctua/.claude/skills/caveman`. Switch via `/caveman [level]`.
+
 ## Verification — non-negotiable
 
 Per `docs/PLAN.md` § "Verification Cadence":

@@ -47,6 +47,7 @@
 
 - [🚀 FAST-RESUME](#-fast-resume-read-this-first-every-session) (above)
 - [🎯 Source of Truth](#-source-of-truth)
+- [🗣️ Response Style — Caveman Ultra](#-response-style--caveman-ultra-default) — default chat compression
 - [🔬 Verification Cadence](#-verification-cadence--godot-mcp--claude-preview-are-non-negotiable) — Godot MCP per task + Claude Preview per day (HTML5 is the ship target)
 - [Context](#context) — jam details, game title, descriptions, target outcome
 - [Genre](#genre) — puzzle genre positioning, audience, tone
@@ -90,6 +91,18 @@
 > - Repo copy (shipped + committed): `docs/PLAN.md` (created Day 1, synced every EOD + every mid-task checkpoint)
 >
 > The two must stay in sync. Treat `docs/PLAN.md` as read-only during a day's work; update it at EOD + at mid-task checkpoints alongside `DEVLOG.md`.
+
+> ## 🗣️ Response Style — Caveman Ultra (default)
+>
+> **Claude replies in Caveman Ultra** on this project. Token-thrift: drop articles, filler, hedging. Fragments fine. Arrows for causality (`write → run → verify`). Abbreviations welcome (DB, auth, req, res, MCP, TTL).
+>
+> **Unchanged:** code, commit messages, PR bodies, `.md` files, `DEVLOG.md` entries, plan edits. Caveman = chat reply only.
+>
+> **Safety suspends caveman:** irreversible ops, security warnings, destructive git, multi-step confirmations — switch to normal mode until clarity, then resume.
+>
+> **Switch levels** via `/caveman [lite|full|ultra|wenyan-lite|wenyan-full]`. "normal mode" exits entirely.
+>
+> Skill: `/Users/mujibnoctua/.claude/skills/caveman`.
 
 > ## 🔬 Verification Cadence — Godot MCP + Claude Preview are non-negotiable
 >
