@@ -23,6 +23,17 @@ func _ready() -> void:
 	# decides what to do.
 	area_entered.connect(_on_area_entered)
 	_apply_rotation_from_data()
+	_play_place_pop_in()
+
+
+## Quick scale pop-in so placed parts feel alive. 0 → 1.1 → 1.0, 0.18 s.
+func _play_place_pop_in() -> void:
+	scale = Vector2.ZERO
+	var tween := create_tween()
+	tween.set_ease(Tween.EASE_OUT)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.12)
+	tween.tween_property(self, "scale", Vector2.ONE, 0.06)
 
 
 func set_cell(c: Vector2i) -> void:

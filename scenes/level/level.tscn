@@ -1,15 +1,25 @@
-[gd_scene load_steps=6 format=3 uid="uid://dpointerworkslevel"]
+[gd_scene load_steps=8 format=3 uid="uid://dpointerworkslevel"]
 
 [ext_resource type="Script" path="res://scripts/level/level.gd" id="1_level"]
 [ext_resource type="Script" path="res://scripts/level/grid_system.gd" id="2_grid"]
 [ext_resource type="Script" path="res://scripts/level/phase_controller.gd" id="3_phase"]
 [ext_resource type="Script" path="res://scripts/level/win_checker.gd" id="4_win"]
 [ext_resource type="PackedScene" uid="uid://dpointerworkshud" path="res://scenes/ui/hud.tscn" id="5_hud"]
+[ext_resource type="Shader" path="res://shaders/grid_glow.gdshader" id="6_gridglow"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
+shader = ExtResource("6_gridglow")
+shader_parameter/bg_color = Color(0.0549, 0.0745, 0.1255, 1)
+shader_parameter/line_color = Color(0.18, 0.22, 0.32, 1)
+shader_parameter/tile_size = 64.0
+shader_parameter/line_thickness = 1.0
+shader_parameter/glow_strength = 0.35
 
 [node name="Level" type="Node2D"]
 script = ExtResource("1_level")
 
 [node name="Background" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_grid")
 offset_right = 1280.0
 offset_bottom = 720.0
 color = Color(0.0549, 0.0745, 0.1255, 1)

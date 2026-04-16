@@ -5,7 +5,7 @@ extends Control
 ## Day 6 adds l09, l10. A locked level shows a padlock and disables click.
 
 const LEVEL_COUNT: int = 10
-const FIRST_AVAILABLE: int = 4  # Day 2 end: l01..l04 exist. Bump as levels land.
+const FIRST_AVAILABLE: int = 8  # Day 3 end: l01..l08 exist. Day 6 bumps to 10.
 
 @onready var _back_button: Button = $VBox/BackButton
 @onready var _grid: GridContainer = $VBox/Grid if has_node("VBox/Grid") else null

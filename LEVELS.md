@@ -34,6 +34,23 @@ Levels may have unintended solutions discovered during playtesting. Not all chee
 |---|---|---|---|
 | (none yet) | | | |
 
+## Implementation status
+
+| Lvl | Status | File |
+|---|---|---|
+| l01 Conveyor   | Day 2 — shipped ✓ | `data/levels/l01.gd` |
+| l02 Press      | Day 2 — shipped ✓ | `data/levels/l02.gd` |
+| l03 Forge      | Day 2 — shipped ✓ | `data/levels/l03.gd` |
+| l04 Refinery   | Day 2 — shipped ✓ | `data/levels/l04.gd` |
+| l05 Lathe      | Day 3 — shipped ✓ | `data/levels/l05.gd` |
+| l06 Kiln       | Day 3 — shipped ✓ | `data/levels/l06.gd` |
+| l07 Foundry    | Day 3 — shipped ✓ | `data/levels/l07.gd` |
+| l08 Assembly   | Day 3 — shipped ✓ | `data/levels/l08.gd` |
+| l09 Reactor    | Day 6 — pending   | `data/levels/l09.gd` |
+| l10 Cyclotron  | Day 6 — pending   | `data/levels/l10.gd` |
+
+Levels ship as GDScript builders (not `.tres`) per plan deviation logged in `docs/PLAN.md`. Each exposes `static func build() -> LevelResource`.
+
 ## Unlock rules
 
 - l01 unlocked on first launch.

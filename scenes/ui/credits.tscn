@@ -1,0 +1,103 @@
+[gd_scene load_steps=2 format=3 uid="uid://dpointerworkscredits"]
+
+[ext_resource type="Script" path="res://scripts/ui/credits.gd" id="1_credits"]
+
+[node name="Credits" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_credits")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0549, 0.0745, 0.1255, 1)
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -360.0
+offset_top = -280.0
+offset_right = 360.0
+offset_bottom = 280.0
+theme_override_constants/separation = 18
+
+[node name="Title" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
+theme_override_font_sizes/font_size = 36
+text = "Pointerworks"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9117, 0.6466, 0.2275, 1)
+theme_override_font_sizes/font_size = 16
+text = "Gamedev.js Jam 2026 — Theme: Machines"
+horizontal_alignment = 1
+
+[node name="Divider" type="HSeparator" parent="VBox"]
+layout_mode = 2
+
+[node name="Authored" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
+theme_override_font_sizes/font_size = 18
+text = "Design + code: MozeeB"
+horizontal_alignment = 1
+
+[node name="Engine" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
+theme_override_font_sizes/font_size = 16
+text = "Engine: Godot 4.6 (MIT)"
+horizontal_alignment = 1
+
+[node name="Tools" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
+theme_override_font_sizes/font_size = 14
+text = "Tooling: Claude Code · Figma MCP · Hugging Face MCP · Claude Preview"
+horizontal_alignment = 1
+
+[node name="Fallbacks" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
+theme_override_font_sizes/font_size = 14
+text = "Audio fallbacks: sfxr.me · BeepBox"
+horizontal_alignment = 1
+
+[node name="License" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
+theme_override_font_sizes/font_size = 14
+text = "Source: github.com/MozeeB/Pointerworks · MIT License"
+horizontal_alignment = 1
+
+[node name="Thanks" type="Label" parent="VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 12
+text = "Thanks to the machines that built this game."
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="BackButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(200, 48)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "← Back"

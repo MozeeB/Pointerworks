@@ -4,6 +4,17 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 3 — 2026-04-17
+
+- Shipped AM: levels 5-8 as .gd builders — l05 Lathe (SpeedMod ×2), l06 Kiln (SpeedMod ×0.5 + Deflector), l07 Foundry (Teleporter pair), l08 Assembly (all 7 parts in one machine: emitter → speed → splitter → up-branch (deflector + teleporter across grid) + down-branch (deflector + slow) → two targets). `level_select` unlock cap raised to 8.
+- Shipped mid: art polish. `shaders/grid_glow.gdshader` — canvas-item shader, procedural 64 px grid with soft glow, GL-Compatibility safe. `shaders/target_pulse.gdshader` — sin-modulated brightness for unhit targets; disabled on hit + re-enabled on reset. Tween juice: Part place pop-in (scale 0 → 1.1 → 1.0, 0.18 s EASE_OUT_BACK), Run button press squish, main-menu title idle float (±3 px sine loop).
+- Shipped PM: Credits scene + SceneSwitcher.to_credits(). Main menu gains Credits button + jam subtitle. HUD win-dialog copy is per-level on-theme (Conveyor hums., Press seated. Clean shear., Full line — green across the board., etc.).
+- Skipped PM: music gen (HF MCP not wired in-session; BeepBox manual trip deferred; AudioBus already no-ops on missing files). TODO Day 4 or 7.
+- Verify: headless boot clean on main.tscn, level.tscn, credits.tscn (zero SCRIPT ERROR). Web re-export (~36 MB wasm raw). Claude Preview reloaded — `docs/preview-day-3` shows grid_glow rendering across the Conveyor floor + cyan target pulsing; Main menu now shows Credits + Play + subtitle. Zero console errors (`preview_console_logs level=error` → empty).
+- Next (Day 4 morning): UX gap closure — FAIL state + FailChecker, Pause menu (Esc), Settings dialog with colorblind palette toggle, Tutorial overlay first-run, Desktop-only blocker, keyboard shortcuts + undo stack.
+
+---
+
 ## Day 2 — 2026-04-17
 
 - Shipped Day 2 AM: `SpeedMod` (factor-based velocity scaling, META_KEY double-apply guard, MIN/MAX speed clamp) + `Teleporter` (pair_id matching via group scan, 36 px spawn offset prevents ping-pong). Extended `scenes/dev/part_test.tscn` with Row 3: EmitterC → SpeedFast → TeleporterA/B → TargetC. Commit `1b1011a`.

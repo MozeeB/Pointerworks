@@ -10,6 +10,7 @@ signal scene_changed(path: String)
 const MAIN_MENU_PATH := "res://scenes/main.tscn"
 const LEVEL_SELECT_PATH := "res://scenes/ui/level_select.tscn"
 const LEVEL_PATH := "res://scenes/level/level.tscn"
+const CREDITS_PATH := "res://scenes/ui/credits.tscn"
 
 ## Pending level id consumed by `Level._ready` on the next transition.
 var pending_level_id: String = "l01"
@@ -21,6 +22,10 @@ func to_main_menu() -> void:
 
 func to_level_select() -> void:
 	_change(LEVEL_SELECT_PATH)
+
+
+func to_credits() -> void:
+	_change(CREDITS_PATH)
 
 
 func to_level(level_id: String) -> void:

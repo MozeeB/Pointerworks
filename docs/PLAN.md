@@ -11,19 +11,20 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-17                   │
-> │ Current day:           Day 2 of 7 — COMPLETE        │
-> │ Last completed:        Day 2 EOD — first web export,│
-> │                        Preview harness green, 4     │
-> │                        levels playable via HUD      │
-> │ Next action:           Day 3 morning — levels 5-8 + │
-> │                        grid/target shaders + music  │
-> │                        + Figma main-menu polish     │
-> │ In-progress (if any):  (none — end of Day 2)        │
+> │ Current day:           Day 3 of 7 — COMPLETE        │
+> │ Last completed:        Day 3 EOD — levels 5-8 +     │
+> │                        shaders + Tween polish +     │
+> │                        Credits scene                │
+> │ Next action:           Day 4 morning — FAIL state + │
+> │                        Pause + Settings + Tutorial  │
+> │                        + Desktop blocker + shortcuts│
+> │ In-progress (if any):  (none — end of Day 3)        │
 > │   └─ last file touched: DEVLOG.md                   │
-> │   └─ last test run:     Preview clean; 0 err logs   │
-> │ Blockers:              None (bundle size to check   │
-> │                        at D7: 36MB wasm raw → gzip) │
-> │ Last commit:            bd2e615                     │
+> │   └─ last test run:     Preview: grid_glow shader   │
+> │                        rendering; 0 console errors  │
+> │ Blockers:              Music deferred; bundle gzip  │
+> │                        check deferred to Day 7      │
+> │ Last commit:            (pending Day 3 EOD)         │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │

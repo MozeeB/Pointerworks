@@ -1,9 +1,16 @@
-[gd_scene load_steps=3 format=3 uid="uid://dpointerworkstarget"]
+[gd_scene load_steps=5 format=3 uid="uid://dpointerworkstarget"]
 
 [ext_resource type="Script" path="res://scripts/parts/target.gd" id="1_target"]
+[ext_resource type="Shader" path="res://shaders/target_pulse.gdshader" id="2_pulse"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_target"]
 size = Vector2(56, 56)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pulse"]
+shader = ExtResource("2_pulse")
+shader_parameter/pulse_speed = 1.8
+shader_parameter/pulse_min = 0.65
+shader_parameter/pulse_max = 1.25
 
 [node name="Target" type="Area2D"]
 collision_layer = 1
@@ -14,6 +21,7 @@ script = ExtResource("1_target")
 shape = SubResource("RectangleShape2D_target")
 
 [node name="Ring" type="Polygon2D" parent="."]
+material = SubResource("ShaderMaterial_pulse")
 color = Color(0.2274, 0.8313, 0.8392, 1)
 polygon = PackedVector2Array(-26, -26, 26, -26, 26, 26, -26, 26)
 
@@ -22,5 +30,6 @@ color = Color(0.0549, 0.0745, 0.1255, 1)
 polygon = PackedVector2Array(-18, -18, 18, -18, 18, 18, -18, 18)
 
 [node name="Core" type="Polygon2D" parent="."]
+material = SubResource("ShaderMaterial_pulse")
 color = Color(0.2274, 0.8313, 0.8392, 1)
 polygon = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
