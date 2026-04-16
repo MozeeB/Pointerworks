@@ -9,6 +9,7 @@ extends Node2D
 const DEFAULT_LEVEL: String = "l01"
 const PAUSE_SCENE := preload("res://scenes/ui/pause_menu.tscn")
 const SETTINGS_SCENE := preload("res://scenes/ui/settings_dialog.tscn")
+const LEVEL_ERROR_SCENE := preload("res://scenes/ui/level_load_error_dialog.tscn")
 
 @export var level_resource: LevelResource
 
@@ -16,7 +17,15 @@ var _pause_menu: CanvasLayer = null
 var _settings_dialog: CanvasLayer = null
 
 
-static func _load_level_by_id(id: String) -> LevelResource:
+func _show_load_error(message: String) -> void:
+	var dlg := LEVEL_ERROR_SCENE.instantiate()
+	add_child(dlg)
+	if dlg.has_method(&"set_message"):
+		dlg.call(&"set_message", message)
+	dlg.back_pressed.connect(_on_back_pressed)
+
+
+func _load_level_by_id(id: String) -> LevelResource:
 	var gd_path := "res://data/levels/%s.gd" % id
 	if ResourceLoader.exists(gd_path):
 		var scr: GDScript = load(gd_path)
@@ -55,12 +64,12 @@ func _ready() -> void:
 		level_resource = _load_level_by_id(id)
 
 	if level_resource == null:
-		push_error("Level: no level_resource assigned and default not found")
+		_show_load_error("Level file missing or failed to build. Try another level.")
 		return
 
 	var err: String = LevelLoader.validate(level_resource)
 	if err != "":
-		push_error("Level: validation failed: " + err)
+		_show_load_error("Level is malformed: %s" % err)
 		return
 
 	_spawned_parts = LevelLoader.populate(level_resource, _grid, _container)

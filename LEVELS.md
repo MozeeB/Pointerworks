@@ -46,8 +46,8 @@ Levels may have unintended solutions discovered during playtesting. Not all chee
 | l06 Kiln       | Day 3 — shipped ✓ | `data/levels/l06.gd` |
 | l07 Foundry    | Day 3 — shipped ✓ | `data/levels/l07.gd` |
 | l08 Assembly   | Day 3 — shipped ✓ | `data/levels/l08.gd` |
-| l09 Reactor    | Day 6 — pending   | `data/levels/l09.gd` |
-| l10 Cyclotron  | Day 6 — pending   | `data/levels/l10.gd` |
+| l09 Reactor    | Day 6 — shipped ✓ | `data/levels/l09.gd` |
+| l10 Cyclotron  | Day 6 — shipped ✓ | `data/levels/l10.gd` |
 
 Levels ship as GDScript builders (not `.tres`) per plan deviation logged in `docs/PLAN.md`. Each exposes `static func build() -> LevelResource`.
 

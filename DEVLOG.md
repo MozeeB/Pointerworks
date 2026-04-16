@@ -4,6 +4,20 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 6 — 2026-04-17
+
+- **Robustness + levels 9-10 shipped.**
+- LevelLoadErrorDialog (`scenes/ui/level_load_error_dialog.tscn`) — red title + reason text + Back-to-menu button. `Level._show_load_error()` replaces silent `push_error` on `level_resource == null` or validation failure.
+- `Progress.save_reset(reason: String)` signal emits on non-ERR_FILE_NOT_FOUND load errors and on version mismatch, so HUD can surface a toast later (stub only; Day 7 polish).
+- l09 Reactor — 1 emitter + splitter + 2 deflectors + speed mod + 2 teleporter pairs + 4 targets. Par 1 — one cursor fires both branches and both teleport pairs.
+- l10 Cyclotron — 2 emitters, 2 teleporter pairs, 4 pass-through targets. Par 2 (one cursor per emit). Both loops independent; designed to look busy when both emitters are hovered.
+- level_select.FIRST_AVAILABLE bumped 8 → 10. All 10 levels unlock via Progress.is_unlocked sequential gating.
+- Verify: Godot headless clean after fixing `static func _show_load_error` slip (was static, should be instance). Re-exported web; Claude Preview main menu loads clean; `typeof window.pointerworks === 'object'` still holds; 0 fresh console errors.
+- Deferred: real external playtest + interactive L9/L10 run-through (requires real OS-mouse hover; synthetic events don't trigger Godot Area2D mouse_entered). Day 7 manual-chrome smoke + external testers.
+- Next (Day 7): web export gzip verify (must stay <15 MB), cover image 630×500, 3 screenshots, GIF/MP4 trailer, itch.io page fill + submission.
+
+---
+
 ## Day 5 — 2026-04-17
 
 - **Ethereum challenge plumbing shipped (skippable by design).**

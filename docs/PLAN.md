@@ -11,22 +11,21 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-17                   │
-> │ Current day:           Day 5 of 7 — COMPLETE        │
-> │ Last completed:        Day 5 EOD — Ethereum plumbing│
-> │                        shipped (contract + tests +  │
-> │                        glue + Web3Bridge + UI,      │
-> │                        deploy self-serve)           │
-> │ Next action:           Day 6 — robustness (save +   │
-> │                        error dialog) + playtest +   │
-> │                        l09 Reactor + l10 Cyclotron  │
-> │ In-progress (if any):  (none — end of Day 5)        │
+> │ Current day:           Day 6 of 7 — COMPLETE        │
+> │ Last completed:        Day 6 EOD — 10 levels live + │
+> │                        LevelLoadErrorDialog + save  │
+> │                        corruption signal            │
+> │ Next action:           Day 7 — web bundle gzip +    │
+> │                        cover image + screenshots +  │
+> │                        GIF/MP4 trailer + itch.io    │
+> │                        submission                   │
+> │ In-progress (if any):  (none — end of Day 6)        │
 > │   └─ last file touched: DEVLOG.md                   │
-> │   └─ last test run:     Preview: window.pointerworks│
-> │                        object exposed; 0 errors     │
-> │ Blockers:              Contract not deployed (user  │
-> │                        self-serve via README). Music│
-> │                        deferred. Bundle gzip at D7. │
-> │ Last commit:            (pending Day 5 EOD)         │
+> │   └─ last test run:     Preview boot clean; 10      │
+> │                        levels unlocked              │
+> │ Blockers:              Contract not deployed; music │
+> │                        deferred; gzip check at D7   │
+> │ Last commit:            (pending Day 6 EOD)         │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │

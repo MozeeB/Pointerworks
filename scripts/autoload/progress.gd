@@ -8,6 +8,7 @@ extends Node
 ## Save schema version: 1. Bump on breaking changes + add migration.
 
 signal progress_changed
+signal save_reset(reason: String)
 
 const SAVE_PATH := "user://save.cfg"
 const CURRENT_VERSION := 1
@@ -25,13 +26,16 @@ func load_progress() -> void:
 	var cfg := ConfigFile.new()
 	var err := cfg.load(SAVE_PATH)
 	if err != OK:
-		# File doesn't exist yet or was corrupted. Defaults already set.
-		# On corruption vs. missing, we don't distinguish for MVP — just reset.
+		# ERR_FILE_NOT_FOUND (no previous save) is expected on first run;
+		# other errors mean localStorage is locked or the blob is corrupt.
+		if err != ERR_FILE_NOT_FOUND:
+			save_reset.emit("save unreadable (err %d)" % err)
 		_reset_to_defaults()
 		return
 	var version: int = cfg.get_value("meta", "version", 0)
 	if version != CURRENT_VERSION:
 		push_warning("Progress: save version mismatch (got %d, expected %d). Resetting." % [version, CURRENT_VERSION])
+		save_reset.emit("save version %d, expected %d" % [version, CURRENT_VERSION])
 		_reset_to_defaults()
 		return
 	seen_tutorial = cfg.get_value("state", "seen_tutorial", false)
