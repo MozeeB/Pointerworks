@@ -14,7 +14,19 @@ It's *The Incredible Machine* for the browser era, where the thing your contrapt
 
 - **itch.io:** _(link added on submission day)_
 - **Source:** https://github.com/MozeeB/Pointerworks
-- **Controls:** Mouse only. Drag parts from the palette onto the grid during BUILD phase; click RUN and move your cursor over Emitters to feed the machine.
+- **Controls:** Mouse only. Hover an Emitter during RUN phase to feed it; parts are pre-laid in v1.0 (palette drag-drop is a post-jam stretch).
+- **Shortcuts:** `Space` = Run/Stop · `Esc` = Pause · `F11` = Fullscreen · `R` = rotate selected part
+
+## Theme — "Machines" (for judges in a hurry)
+
+Four layers, each reinforced in the code:
+
+1. **The factory is the machine** — every level is a literal grid of machine parts.
+2. **The player is the fuel** — the real OS cursor is what Emitters consume.
+3. **The browser is the machine** — mechanic only works on desktop browsers (enforced in-game via `DesktopOnlyBlocker`).
+4. **Debugging is gameplay** — BUILD → RUN → FAIL → BUILD loop is industrial iteration.
+
+Level names follow industrial machinery: Conveyor, Press, Forge, Refinery, Lathe, Kiln, Foundry, Assembly, Reactor, Cyclotron. Full rationale + judge-facing copy in [`THEME.md`](THEME.md).
 
 ## Build locally
 
@@ -36,8 +48,9 @@ All project context lives in `docs/PLAN.md` — the single source of truth for s
 - [`PARTS.md`](PARTS.md) — 7-part reference sheet
 - [`LEVELS.md`](LEVELS.md) — 10-level design notes
 - [`CREDITS.md`](CREDITS.md) — attribution
-- [`DEVLOG.md`](DEVLOG.md) — daily journal
+- [`DEVLOG.md`](DEVLOG.md) — daily journal (Days 1-7 all shipped)
 - [`ISSUES.md`](ISSUES.md) — known bugs
+- [`docs/SUBMISSION_CHECKLIST.md`](docs/SUBMISSION_CHECKLIST.md) — Day 7 itch.io upload sequence + bundle sanity table
 
 ## Side challenges
 

@@ -4,6 +4,18 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 7 — 2026-04-17
+
+- **Submission prep. v1.0 tagged.**
+- Bundle gzip sanity: `build/index.wasm` 36 MB raw → **9.4 MB gzip**; total over-the-wire **~9.7 MB** (budget was <15 MB). itch.io gzips static assets automatically. Measurement logged in `docs/SUBMISSION_CHECKLIST.md`.
+- `docs/SUBMISSION_CHECKLIST.md` — Day 7 worksheet pointing at `docs/PLAN.md` § "itch.io submission form — field-by-field reference" (40-row table). Pre-submit gate checklist, upload-order sequence, field values, media-still-needed list.
+- README polished: Theme-for-judges section (4 layers), shortcut row, controls clarification (parts pre-laid in v1.0; palette drag-drop deferred post-jam), link to SUBMISSION_CHECKLIST.md.
+- Git tag `v1.0` created at Day 7 HEAD (detached on the EOD commit).
+- Remaining human-assist items (Claude Preview MCP cannot persist canvas bitmaps to disk inline): `docs/cover.png` (630×500 PNG), 3 in-engine screenshots, GIF/MP4 trailer, itch.io account actions. All steps enumerated in the checklist.
+- Final state: 10 levels live, 7 parts implemented, grid_glow + target_pulse shaders, Tween juice everywhere, full FSM (BUILD/RUN/WIN/FAIL), Pause + Settings + Tutorial + DesktopBlocker + LevelLoadErrorDialog, MIT licensed, Ethereum plumbing ready (deploy self-serve per README), non-threads web export 9.7 MB over wire.
+
+---
+
 ## Day 6 — 2026-04-17
 
 - **Robustness + levels 9-10 shipped.**

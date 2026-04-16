@@ -11,21 +11,23 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-17                   │
-> │ Current day:           Day 6 of 7 — COMPLETE        │
-> │ Last completed:        Day 6 EOD — 10 levels live + │
-> │                        LevelLoadErrorDialog + save  │
-> │                        corruption signal            │
-> │ Next action:           Day 7 — web bundle gzip +    │
-> │                        cover image + screenshots +  │
-> │                        GIF/MP4 trailer + itch.io    │
-> │                        submission                   │
-> │ In-progress (if any):  (none — end of Day 6)        │
+> │ Current day:           Day 7 of 7 — COMPLETE (code) │
+> │ Last completed:        Day 7 EOD — bundle gzip      │
+> │                        verified, SUBMISSION_CHECK + │
+> │                        README polish, v1.0 tagged   │
+> │ Next action:           HUMAN ASSIST — cover PNG +   │
+> │                        3 screenshots + trailer GIF/ │
+> │                        MP4 + itch.io submission per │
+> │                        docs/SUBMISSION_CHECKLIST.md │
+> │ In-progress (if any):  (none — code complete)       │
 > │   └─ last file touched: DEVLOG.md                   │
-> │   └─ last test run:     Preview boot clean; 10      │
-> │                        levels unlocked              │
-> │ Blockers:              Contract not deployed; music │
-> │                        deferred; gzip check at D7   │
-> │ Last commit:            (pending Day 6 EOD)         │
+> │   └─ last test run:     Preview boot clean; 9.7 MB  │
+> │                        over-wire bundle (< 15 MB)   │
+> │ Blockers:              Claude Preview inline        │
+> │                        screenshots do not persist   │
+> │                        to disk; cover + 3 PNGs need │
+> │                        a manual Chrome capture run  │
+> │ Last commit:            (pending Day 7 EOD + v1.0)  │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │
