@@ -1,0 +1,19 @@
+# Godot
+.godot/
+build/
+export_presets.cfg
+
+# macOS
+.DS_Store
+
+# Temp
+*.tmp
+*.bak
+
+# Secrets
+.env
+
+# Foundry (Ethereum — Day 5)
+contracts/out/
+contracts/cache/
+contracts/broadcast/
