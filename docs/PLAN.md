@@ -11,16 +11,18 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-16                   │
-> │ Current day:           Day 1 of 7                   │
-> │ Last completed:        (plan write)                 │
-> │ Next action:           Clean project.godot +        │
-> │                        create 10 .md docs +         │
-> │                        copy plan to docs/PLAN.md    │
-> │ In-progress (if any):  (none — not started)         │
-> │   └─ last file touched: (n/a)                       │
-> │   └─ last test run:     (n/a)                       │
+> │ Current day:           Day 1 of 7 — COMPLETE        │
+> │ Last completed:        Day 1 EOD — 5 parts +        │
+> │                        GridSystem + VirtualCursor + │
+> │                        dev test scene shipped       │
+> │ Next action:           Day 2 morning — Speed Mod +  │
+> │                        Teleporter, then phase FSM + │
+> │                        palette + 4 levels           │
+> │ In-progress (if any):  (none — end of Day 1)        │
+> │   └─ last file touched: scripts/parts/splitter.gd   │
+> │   └─ last test run:     manual verify pending       │
 > │ Blockers:              None                         │
-> │ Last commit:            (none — repo not init'd)    │
+> │ Last commit:            5fdedb7 (+ Day 1 EOD pending)│
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │

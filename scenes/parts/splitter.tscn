@@ -1,0 +1,26 @@
+[gd_scene load_steps=3 format=3 uid="uid://dpointerworkssplitter"]
+
+[ext_resource type="Script" path="res://scripts/parts/splitter.gd" id="1_splitter"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_splitter"]
+size = Vector2(48, 48)
+
+[node name="Splitter" type="Area2D"]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_splitter")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_splitter")
+
+[node name="Body" type="Polygon2D" parent="."]
+color = Color(0.8509, 0.2745, 0.7019, 1)
+polygon = PackedVector2Array(0, -28, 28, 0, 0, 28, -28, 0)
+
+[node name="ForkUp" type="Polygon2D" parent="."]
+color = Color(0.0549, 0.0745, 0.1255, 1)
+polygon = PackedVector2Array(-4, -4, 4, -4, 4, -18, 12, -18, 0, -26, -12, -18, -4, -18)
+
+[node name="ForkDown" type="Polygon2D" parent="."]
+color = Color(0.0549, 0.0745, 0.1255, 1)
+polygon = PackedVector2Array(-4, 4, 4, 4, 4, 18, 12, 18, 0, 26, -12, 18, -4, 18)

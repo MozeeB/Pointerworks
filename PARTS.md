@@ -27,12 +27,21 @@ The 7 parts that make up every machine. Each part is 64 × 64 px, placed on a gr
 
 | Part | Status | File |
 |---|---|---|
-| Emitter | — | `scripts/parts/emitter.gd` |
-| Wall | — | `scripts/parts/wall.gd` |
-| Target | — | `scripts/parts/target.gd` |
-| Deflector | — | `scripts/parts/deflector.gd` |
-| Splitter | — | `scripts/parts/splitter.gd` |
-| Speed Modifier | — | `scripts/parts/speed_mod.gd` |
-| Teleporter | — | `scripts/parts/teleporter.gd` |
+| Emitter | Day 1 — script + scene ✓ | `scripts/parts/emitter.gd`, `scenes/parts/emitter.tscn` |
+| Wall | Day 1 — script + scene ✓ | `scripts/parts/wall.gd`, `scenes/parts/wall.tscn` |
+| Target | Day 1 — script + scene ✓ | `scripts/parts/target.gd`, `scenes/parts/target.tscn` |
+| Deflector | Day 1 — script + scene ✓ | `scripts/parts/deflector.gd`, `scenes/parts/deflector.tscn` |
+| Splitter | Day 1 — script + scene ✓ | `scripts/parts/splitter.gd`, `scenes/parts/splitter.tscn` |
+| Speed Modifier | Day 2 — pending | `scripts/parts/speed_mod.gd` |
+| Teleporter | Day 2 — pending | `scripts/parts/teleporter.gd` |
 
 Updated as each part lands during Days 1-2.
+
+## Day 1 smoke scene
+
+`scenes/dev/part_test.tscn` exercises all 5 Day 1 parts:
+
+- **Row 1 (y=160):** EmitterA → straight-line → TargetA. WallA below path is inert until crossed.
+- **Row 2 (y=416):** EmitterB → Splitter forks UP and DOWN → DeflectorUp (steps=0) turns UP→RIGHT → TargetUp; DeflectorDown (steps=2 / node rot=π) turns DOWN→RIGHT → TargetDown.
+
+Hovering each emitter with the real OS cursor should light up every target. The fork-bomb guard in `Splitter` + 36 px spawn offset prevents runaway cursor counts when cursors spawn inside the splitter's Area2D.

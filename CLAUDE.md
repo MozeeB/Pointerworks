@@ -68,4 +68,4 @@ docs/              — PLAN.md, ART.md, GAME_FLOW.md, cover.png, trailer.gif, sc
 
 ## Current sprint day
 
-Day 1 of 7 (Apr 16 2026) — see `DEVLOG.md` for end-of-day entries and `docs/PLAN.md` FAST-RESUME block for current live state.
+Day 1 of 7 (Apr 16 2026) — 5 of 7 parts shipped (Emitter, Wall, Target, Deflector, Splitter) + `GridSystem` + `VirtualCursor` + `scenes/dev/part_test.tscn` smoke scene. See `DEVLOG.md` for end-of-day entries and `docs/PLAN.md` FAST-RESUME block for current live state.

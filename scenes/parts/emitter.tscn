@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://dpointerworksemitter"]
+
+[ext_resource type="Script" path="res://scripts/parts/emitter.gd" id="1_emitter"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_emitter"]
+size = Vector2(56, 56)
+
+[node name="Emitter" type="Area2D"]
+collision_layer = 1
+collision_mask = 2
+input_pickable = true
+script = ExtResource("1_emitter")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_emitter")
+
+[node name="Body" type="Polygon2D" parent="."]
+color = Color(0.9117, 0.6466, 0.2275, 1)
+polygon = PackedVector2Array(-28, -28, 28, -28, 28, 28, -28, 28)
+
+[node name="Nozzle" type="Polygon2D" parent="."]
+color = Color(0.9489, 0.9411, 0.9137, 1)
+polygon = PackedVector2Array(10, -10, 24, 0, 10, 10, 14, 0)
