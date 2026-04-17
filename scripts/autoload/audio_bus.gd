@@ -8,7 +8,7 @@ extends Node
 
 const SFX_POOL_SIZE: int = 8
 const SFX_DIR: String = "res://audio/sfx/"
-const MUSIC_PATH: String = "res://audio/music/factory_loop.ogg"
+const MUSIC_PATH: String = "res://audio/music/factory_loop.wav"
 
 var _sfx_players: Array[AudioStreamPlayer] = []
 var _sfx_cursor: int = 0
@@ -50,9 +50,14 @@ func prime_music() -> void:
 	if stream == null:
 		return
 	_music_player.stream = stream
-	# Enable loop if the stream supports it.
+	# Enable loop on whichever stream type it is.
 	if stream is AudioStreamOggVorbis:
 		(stream as AudioStreamOggVorbis).loop = true
+	elif stream is AudioStreamWAV:
+		var w := stream as AudioStreamWAV
+		w.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		w.loop_begin = 0
+		w.loop_end = 0
 	_music_player.play()
 	_music_primed = true
 
@@ -64,9 +69,11 @@ func stop_music() -> void:
 func _get_sfx(sfx_name: String) -> AudioStream:
 	if _sfx_cache.has(sfx_name):
 		return _sfx_cache[sfx_name]
-	var path: String = "%s%s.ogg" % [SFX_DIR, sfx_name]
-	if not ResourceLoader.exists(path):
-		return null
-	var stream: AudioStream = load(path)
-	_sfx_cache[sfx_name] = stream
-	return stream
+	# Try .wav first (ships procedural Day 8 fallback), then .ogg (HF-generated if present).
+	for ext in [".wav", ".ogg"]:
+		var path: String = "%s%s%s" % [SFX_DIR, sfx_name, ext]
+		if ResourceLoader.exists(path):
+			var stream: AudioStream = load(path)
+			_sfx_cache[sfx_name] = stream
+			return stream
+	return null

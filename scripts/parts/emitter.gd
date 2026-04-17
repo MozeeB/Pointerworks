@@ -20,6 +20,17 @@ func _ready() -> void:
 	super()
 	mouse_entered.connect(_on_real_mouse_enter)
 	mouse_exited.connect(_on_real_mouse_exit)
+	_apply_palette()
+	var s := get_node_or_null(^"/root/Settings")
+	if s != null:
+		s.settings_changed.connect(_apply_palette)
+
+
+func _apply_palette() -> void:
+	# Re-color the amber body when colorblind toggles.
+	if has_node("Body"):
+		var body: Polygon2D = $Body
+		body.color = AppPalette.get_color(AppPalette.Swatch.EMITTER_AMBER)
 
 
 func _process(delta: float) -> void:

@@ -28,12 +28,36 @@ signal retry_pressed
 @onready var _fail_label: Label = $FailBanner/Label if has_node("FailBanner/Label") else null
 @onready var _onchain_btn: Button = $WinPanel/VBox/OnChainRow/OnChainButton if has_node("WinPanel/VBox/OnChainRow/OnChainButton") else null
 @onready var _onchain_status: Label = $WinPanel/VBox/OnChainRow/OnChainStatus if has_node("WinPanel/VBox/OnChainRow/OnChainStatus") else null
+@onready var _palette: Control = $PartPalette if has_node("PartPalette") else null
+@onready var _hint_banner: Label = $HintBanner if has_node("HintBanner") else null
+
+
+func get_palette() -> Control:
+	return _palette
+
+
+func show_hint(text: String, duration: float = 4.0) -> void:
+	if _hint_banner == null or text == "":
+		return
+	_hint_banner.text = text
+	_hint_banner.show()
+	_hint_banner.modulate = Color(1, 1, 1, 0)
+	var tween := create_tween()
+	tween.tween_property(_hint_banner, "modulate:a", 1.0, 0.4)
+	tween.tween_interval(duration)
+	tween.tween_property(_hint_banner, "modulate:a", 0.0, 0.6)
+	tween.tween_callback(_hint_banner.hide)
 
 
 signal submit_on_chain_pressed
 
 
 func _ready() -> void:
+	var p := get_node_or_null(^"/root/Progress")
+	if p != null and p.has_signal(&"save_reset"):
+		p.save_reset.connect(func(reason: String):
+			show_hint("Save reset — %s" % reason, 3.0)
+		)
 	_back_btn.pressed.connect(func(): back_pressed.emit())
 	_run_btn.pressed.connect(_on_run_toggle)
 	_next_btn.pressed.connect(func(): next_pressed.emit())

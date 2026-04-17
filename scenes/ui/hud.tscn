@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dpointerworkshud"]
+[gd_scene format=3 uid="uid://dt1m8k74ebb6n"]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud"]
+[ext_resource type="Script" path="res://scripts/ui/part_palette.gd" id="2_palette"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -70,6 +71,21 @@ theme_override_font_sizes/font_size = 20
 text = "BUILD"
 horizontal_alignment = 2
 vertical_alignment = 1
+
+[node name="PartPalette" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -100.0
+offset_right = -16.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("2_palette")
 
 [node name="RunBar" type="Control" parent="."]
 layout_mode = 3
@@ -165,6 +181,18 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.58, 0.65, 1)
 theme_override_font_sizes/font_size = 12
 text = ""
+
+[node name="HintBanner" type="Label" parent="."]
+visible = false
+offset_left = 180.0
+offset_top = 72.0
+offset_right = 1100.0
+offset_bottom = 104.0
+theme_override_colors/font_color = Color(0.9117, 0.6466, 0.2275, 1)
+theme_override_font_sizes/font_size = 16
+text = ""
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="FailBanner" type="PanelContainer" parent="."]
 visible = false

@@ -34,6 +34,19 @@ func _play_place_pop_in() -> void:
 	tween.set_trans(Tween.TRANS_BACK)
 	tween.tween_property(self, "scale", Vector2(1.1, 1.1), 0.12)
 	tween.tween_property(self, "scale", Vector2.ONE, 0.06)
+	var audio := get_node_or_null(^"/root/AudioBus")
+	if audio != null and audio.has_method(&"play_sfx"):
+		audio.call(&"play_sfx", &"place_part")
+
+
+## Shrink tween for removed parts. Caller awaits the tween.finished
+## signal before queue_free to keep the visual clean.
+func play_remove_shrink() -> Tween:
+	var tween := create_tween()
+	tween.set_ease(Tween.EASE_IN)
+	tween.set_trans(Tween.TRANS_BACK)
+	tween.tween_property(self, "scale", Vector2.ZERO, 0.12)
+	return tween
 
 
 func set_cell(c: Vector2i) -> void:

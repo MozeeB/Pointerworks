@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://dpointerworksteleporter"]
+[gd_scene format=3 uid="uid://ckfvkqd88un0x"]
 
 [ext_resource type="Script" path="res://scripts/parts/teleporter.gd" id="1_teleporter"]
 

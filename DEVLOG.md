@@ -4,6 +4,26 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 8 (post-v1.0 gap closure) — 2026-04-17
+
+User asked to close every code-gap. Done in one pass; all shipped.
+
+- **Audio shipped.** `tools/gen_sfx.py` (Python stdlib `wave`, no ffmpeg needed) generates 5 tiny SFX + a 20 s factory-drone music loop directly into `audio/`. Files: `spawn.wav` 10 KB, `deflect.wav` 9 KB, `hit_target.wav` 18 KB, `win.wav` 58 KB, `place_part.wav` 7 KB, `music/factory_loop.wav` 1.7 MB. `AudioBus._get_sfx` now tries `.wav` first, falls back to `.ogg` (HF-gen swap-in path preserved). `prime_music` added WAV loop-mode branch. Hook points wired: Part _ready plays `place_part`; Level._on_level_complete plays `win`; Emitter keeps `spawn`; Deflector/Splitter/SpeedMod keep `deflect`; Target keeps `hit_target`.
+- **PartPalette drag-replacement shipped.** `scripts/ui/part_palette.gd` — 7-slot click-to-select Control (not drag; jam-friendly). Per-slot count badge (−1 = ∞). `configure(types, counts)` called by Level from `LevelResource.palette_types` + `palette_counts`. `consume`, `restore`, `selected`, `select_slot_by_index` API. HUD owns the node at bottom; Level toggles visibility on BUILD entry + palette-nonempty.
+- **Level place / remove / rotate wired.** `_try_place_at_mouse`, `_try_remove_at_mouse`, `_rotate_hovered_part`. Left-click = place (BUILD only); right-click = remove (BUILD + non-locked only); `R` rotates hovered part. Pre-laid placements with `locked=true` are immutable; Level tracks `_locked_cells`.
+- **Undo stack (10-entry ring) shipped.** `_push_undo` / `_pop_undo` handle both `place` and `remove` ops. `pw_undo` → Z key (not Ctrl+Z for jam speed). Palette counts restored/consumed on undo. Cleared implicitly when level resets (since nodes re-built).
+- **InputMap extended.** `pw_undo` (Z), `pw_part_1..7` (keycodes 49-55). Level `_unhandled_input` handles all plus grid clicks.
+- **l04 Refinery now palette-mode.** Pre-laid emitter + 2 targets; palette exposes 1 splitter + 2 deflectors (exact count — no over-allocation). Player must place to solve. Demonstrates full feature.
+- **Hint banner shipped.** Replaces "5 tooltip Labels for L1-3" plan item with a general-purpose per-level hint banner. `HUD.show_hint(text, dur)` fades in 0.4 s → holds duration → fades out 0.6 s. Every `LevelResource.hint` shown on BUILD entry.
+- **Screen shake on fail shipped.** 6-kick position Tween on the Level Node2D (~0.3 s, ±6 px). Fires alongside `_on_level_failed`.
+- **Remove shrink Tween shipped.** `Part.play_remove_shrink()` returns the Tween so callers can chain queue_free. Used by `_try_remove_at_mouse` + `_pop_undo`.
+- **Colorblind live-swap shipped.** Emitter + SpeedMod subscribe to `Settings.settings_changed`, call `_apply_palette` which re-reads `AppPalette.get_color(EMITTER_AMBER)` (already returns the blue variant when `colorblind_palette` is true). No scene reload required. Wall/Target/Deflector/Splitter/Teleporter unchanged (non-amber).
+- **Save-reset toast shipped.** HUD listens on `Progress.save_reset(reason)` + reuses `show_hint` to surface "Save reset — <reason>" for 3 s. Fires on version-mismatch + on read errors other than 404.
+- Verify: headless main+level boot clean (0 SCRIPT ERROR). Re-exported web — PCK grew 478 KB → 866 KB (added audio files), wasm unchanged. Claude Preview (new server) boots clean; TutorialOverlay fires on fresh localStorage; 0 console errors.
+- Still human-assist only: contract deploy, cover.png, 3 screenshots, trailer GIF/MP4, itch upload + jam submit. See `docs/SUBMISSION_CHECKLIST.md`.
+
+---
+
 ## Day 7 — 2026-04-17
 
 - **Submission prep. v1.0 tagged.**

@@ -11,23 +11,23 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-17                   │
-> │ Current day:           Day 7 of 7 — COMPLETE (code) │
-> │ Last completed:        Day 7 EOD — bundle gzip      │
-> │                        verified, SUBMISSION_CHECK + │
-> │                        README polish, v1.0 tagged   │
-> │ Next action:           HUMAN ASSIST — cover PNG +   │
-> │                        3 screenshots + trailer GIF/ │
-> │                        MP4 + itch.io submission per │
-> │                        docs/SUBMISSION_CHECKLIST.md │
-> │ In-progress (if any):  (none — code complete)       │
+> │ Current day:           Day 8 (post-v1.0 gap close)  │
+> │ Last completed:        All code gaps closed in one  │
+> │                        pass — audio, palette, undo, │
+> │                        keys, hint, shake, shrink,   │
+> │                        colorblind live, save toast  │
+> │ Next action:           HUMAN ASSIST only — contract │
+> │                        deploy, cover PNG, screens,  │
+> │                        trailer, itch upload, jam    │
+> │                        submit per SUBMISSION docs   │
+> │ In-progress (if any):  (none — code-complete)       │
 > │   └─ last file touched: DEVLOG.md                   │
-> │   └─ last test run:     Preview boot clean; 9.7 MB  │
-> │                        over-wire bundle (< 15 MB)   │
-> │ Blockers:              Claude Preview inline        │
-> │                        screenshots do not persist   │
-> │                        to disk; cover + 3 PNGs need │
-> │                        a manual Chrome capture run  │
-> │ Last commit:            (pending Day 7 EOD + v1.0)  │
+> │   └─ last test run:     Preview boot clean; PCK     │
+> │                        866 KB; wasm 36 MB (9.4 gz); │
+> │                        0 console errors             │
+> │ Blockers:              Claude Preview cannot persist│
+> │                        canvas PNG to disk           │
+> │ Last commit:            (pending Day 8 EOD)         │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │

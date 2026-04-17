@@ -17,6 +17,16 @@ const META_KEY := &"speed_mod_touched"
 
 func _ready() -> void:
 	super()
+	_apply_palette()
+	var s := get_node_or_null(^"/root/Settings")
+	if s != null:
+		s.settings_changed.connect(_apply_palette)
+
+
+func _apply_palette() -> void:
+	if has_node("Body"):
+		var body: Polygon2D = $Body
+		body.color = AppPalette.get_color(AppPalette.Swatch.EMITTER_AMBER)
 
 
 func apply_to_cursor(cursor: VirtualCursor) -> void:

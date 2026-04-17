@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dpointerworksdesktop"]
+[gd_scene format=3 uid="uid://b3sl837krpaa6"]
 
 [ext_resource type="Script" path="res://scripts/ui/desktop_only_blocker.gd" id="1_desktop"]
 

@@ -1,14 +1,16 @@
 extends RefCounted
-## L04 Refinery — fork one stream into two via Splitter.
+## L04 Refinery — introduces the palette. Player places the Splitter
+## and both Deflectors to route a single emit into both targets.
 ##
-## Emitter → Splitter in the middle of the grid → UP branch into a
-## Deflector that turns RIGHT into Target A; DOWN branch into a
-## Deflector turning RIGHT into Target B.
+## Pre-laid: emitter + 2 targets. Palette: 1 splitter + 2 deflectors
+## (exact count — no over-allocation). Click a palette slot, click the
+## grid to place. Right-click a placed part to remove. R rotates the
+## hovered part. Ctrl+Z (Z) undoes the last place/remove.
 
 const ID := "l04"
 const DISPLAY_NAME := "Refinery"
-const HINT := "Splitter forks the stream perpendicular to input."
-const PAR_CURSORS := 1  # 1 emit fires the whole network (splitter doubles internally)
+const HINT := "Place the splitter + deflectors. Click a palette slot, click the grid."
+const PAR_CURSORS := 1
 
 
 static func build() -> LevelResource:
@@ -20,18 +22,13 @@ static func build() -> LevelResource:
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
 		_pl(Vector2i(1, 4), PartData.Type.EMITTER),
-		_pl(Vector2i(7, 4), PartData.Type.SPLITTER),
-		# UP branch: DOWN cursor from splitter is (0, +y). DeflectorDown rotation 2 → +PI, produces (256,0) right.
-		# Wait: splitter input right (+x) → dir_a = rotated(PI/2) = (0, +y) DOWN; dir_b = (0, -y) UP.
-		# UP cursor at y decreasing. DeflectorUp (steps=0, angle=PI/2) turns UP→RIGHT (0,-y).rot(PI/2)=(y,0)=(+,0) RIGHT.
-		# DOWN cursor goes +y. DeflectorDown needs to turn DOWN→RIGHT. Angle needed: (0,+y)→(+x,0) = rotate by -PI/2.
-		# Formula angle = PI/2 + steps*PI/2. Want 3PI/2 → steps=2 → node rot = PI.
-		_pl(Vector2i(7, 1), PartData.Type.DEFLECTOR, 0),  # UP branch turns right
-		_pl(Vector2i(7, 7), PartData.Type.DEFLECTOR, 2),  # DOWN branch turns right
 		_pl(Vector2i(14, 1), PartData.Type.TARGET),
 		_pl(Vector2i(14, 7), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	# Palette — type ids match PartData.Type enum ordering.
+	# 3 = DEFLECTOR, 4 = SPLITTER
+	lvl.palette_types = [4, 3]
+	lvl.palette_counts = [1, 2]  # 1 splitter, 2 deflectors; exact solve
 	return lvl
 
 
