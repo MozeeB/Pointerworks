@@ -1,5 +1,103 @@
 # Pointerworks — Gamedev.js Jam 2026 (7-day sprint)
 
+> ## 🎨 Day 9 — UI/UX Polish Plan (active)
+>
+> ### Context
+> User feedback after gameplay redesign (`9662a53`):
+> 1. Levels are now puzzles, but UX still feels "rough jam game" rather than "polished demo".
+> 2. Audit identified discoverability gaps (no hover affordance, palette appears without transition, click-emitter cue absent), feedback gaps (no cell flash on placement, no win burst, fail snaps back instantly), hierarchy issues (HintBanner overlaps title, WinPanel lacks dim overlay), polish cliffs (emitter has no idle, target has no celebration, fail color hardcoded outside palette), and responsive gaps (DesktopBlocker hardcoded for 1280×720).
+> 3. **Goal:** every interactive element has a visible affordance; win/fail moments are *felt*; no hex literals outside `AppPalette`. Bundle stays <10 MB gzip. ~2-3 hr scope.
+>
+> ### Phase order (dependency-aware)
+>
+> Execute in this order — D12 first because it's a prereq (new Swatch enums) for A/B/C:
+>
+> 1. **D12 — Palette Swatch additions** (`scripts/util/color_palette.gd`)
+>    - Extend `Swatch` enum: `FAIL_RED`, `WIN_GREEN`, `HOVER_TINT`, `SELECTION_RING`, `OVERLAY_DIM`, `MUTED_TEXT`, `ACCENT`.
+>    - `get_color()` returns the right Color per swatch (with colorblind branch as today).
+>    - Migrate hardcoded `Color(0.95, 0.3, 0.3, 1)` (fail label in `hud.tscn`) and `Color(0.55, 0.58, 0.65, 1)` (muted) to swatches.
+>    - **Effort:** S. **Verify:** `grep -r 'Color(' scenes/ scripts/ | grep -v color_palette` returns minimal hits.
+>
+> 2. **Phase A — Affordance pass** (highest discoverability win)
+>    - **A1 Grid hover ring** — new `shaders/grid_hover.gdshader` (canvas_item, GL Compatibility safe). `GridSystem._process` polls `get_global_mouse_position()` → cell coord → sets shader `uniform vec2 hover_cell`. Only active during BUILD; clear coord on RUN. Shader draws a 2 px ring around the hovered cell.
+>    - **A2 Emitter idle pulse** — `Emitter._ready` starts a looping Tween (modulate.a 0.85↔1.0 + scale 1.0↔1.06 over 1.2 s, ease InOut). Pause when phase = RUN (already vibrant via cursor spawns).
+>    - **A3 Palette fade-in on BUILD** — `Level._on_phase_changed(BUILD)` tweens `_palette.modulate.a` 0→1 + `position.y` +16→0 over 0.25 s. Default `modulate.a = 0` in scene.
+>    - **A4 Context hint chips** — small Label row under palette: `R rotate · Right-click remove · Z undo · 1-7 select`. Fades in 0.4 s after palette. Uses `MUTED_TEXT`.
+>    - **Effort:** M (~40 min). **Verify:** Preview screenshot — grid hover ring renders on cell under mouse; emitter visibly breathes; palette slides in; chip row visible.
+>
+> 3. **Phase C — Feedback bursts** (biggest "feel" win)
+>    - **C1 Cell-flash on placement** — `Level._try_place_at_mouse` (already exists) calls new `_flash_cell(cell)` which spawns a `Polygon2D` square sized to TILE_SIZE colored `ACCENT`, tweens `modulate.a 0.8→0` + `scale 1.0→1.25` over 0.3 s, then `queue_free`.
+>    - **C2 Target celebration burst** — `Target.apply_to_cursor` on first hit spawns 8 small `Polygon2D` triangles radiating outward 24 px + fade over 0.5 s. Color `WIN_GREEN`. Cap at 8 to keep web perf clean (no GPUParticles2D — GL Compatibility friendly).
+>    - **C3 Cursor birth flash** — `Emitter._spawn_cursor` (post add_child + global_position set) spawns a `Polygon2D` ring (radius 4→20, alpha 1→0, 0.25 s) at the emitter cell.
+>    - **C4 Fail breathe-out** — `Level._on_level_failed` waits 0.5 s before `_phase.to_build()`. During the dwell, tween Level `modulate` 1.0→`FAIL_RED`-tinted →1.0; auto-skip on click.
+>    - **Effort:** M (~45 min). **Verify:** Place a part → cell flashes; cursor reaches target → 8 shards burst + cyan→`WIN_GREEN` flash; cursor spawn → birth ring at emitter; fail → red dwell → BUILD.
+>
+> 4. **Phase B — Hierarchy + dim-overlay consistency**
+>    - **B5 WinPanel dim overlay** — add `DimOverlay` ColorRect (full-rect, color `OVERLAY_DIM` @ 55 % alpha) as sibling before WinPanel in `hud.tscn`. Tween alpha 0→0.55 over 0.2 s when WinPanel shows; reset on hide. Match `PauseMenu` pattern.
+>    - **B6 HintBanner reposition** — move from y=72 (overlapping TopBar title) to anchor below RunBar (y = `RunBar.bottom + 8`). Stops competing with title.
+>    - **B7 Phase label subordination** — phase Label font_size 14 (was 20), color `MUTED_TEXT`. Level title stays 22 semibold dominant.
+>    - **Effort:** S (~25 min). **Verify:** WinPanel + PauseMenu now share dim overlay; title dominates over phase label; hint sits below the action area.
+>
+> 5. **Phase D13-14 — Palette polish (selection ring + number badges)**
+>    - **D13 Selection ring** — `PartPalette._select_slot` tweens slot StyleBoxFlat `border_width_*` 1→3 + `border_color`→`SELECTION_RING` + inner modulate +10 % brightness over 0.15 s. Reverse on deselect.
+>    - **D14 Number-key badges** — each palette slot gets a small Label child "1"…"5" top-right corner, `MUTED_TEXT`, font_size 10, monospace. Static (no tween). Reinforces `pw_part_1..7` shortcuts.
+>    - **Effort:** S (~25 min). **Verify:** Click slot or press 1-5 → ring brightens; badges legible.
+>
+> 6. **Phase E — Responsive desktop blocker**
+>    - **E15** — `DesktopOnlyBlocker._ready` connects `get_tree().root.size_changed`. Threshold `MIN_W = 1100`, `MIN_H = 620` (down from hardcoded 1280×720). `_on_viewport_resized()` shows/hides blocker based on current dims (via `set_deferred` debounce).
+>    - **Effort:** S (~15 min). **Verify:** Resize Preview window 1200×700 → playable; 900×600 → blocker shown; resize live → toggles correctly.
+>
+> 7. **Phase F — Verify each phase + final smoke**
+>    - Per phase: Godot headless `--quit-after 3` clean (0 SCRIPT ERROR), Claude Preview `preview_screenshot` saved to `docs/preview-day-9-phase[A/B/C/D/E].png`, `preview_console_logs level=error` clean.
+>    - Final: full L1→L3 playthrough via Preview; bundle gzip still ~9.7 MB; DEVLOG Day 9 entry with `Verify:` bullet citing all 5 phase screenshots; commit + push + plan sync.
+>
+> ### Critical files
+>
+> | File | Phase | Change |
+> |---|---|---|
+> | `scripts/util/color_palette.gd` | D12 | +7 Swatch enum entries + colorblind branch |
+> | `shaders/grid_hover.gdshader` (NEW) | A1 | ~25 lines, hover ring shader |
+> | `scripts/level/grid_system.gd` | A1 | `_process` mouse → cell → shader uniform |
+> | `scripts/parts/emitter.gd` + `scenes/parts/emitter.tscn` | A2, C3 | Idle pulse Tween; cursor birth ring |
+> | `scripts/level/level.gd` | A3, C1, C4 | Palette fade; cell flash; fail breathe |
+> | `scripts/ui/hud.tscn` + `scripts/ui/hud.gd` | A4, B5-7 | Hint chips; dim overlay; reposition; font sizes |
+> | `scripts/parts/target.gd` + `scenes/parts/target.tscn` | C2 | Hit burst (8 shards) |
+> | `scripts/ui/part_palette.gd` | D13-14 | Selection ring tween; number badges |
+> | `scripts/ui/desktop_only_blocker.gd` | E15 | Viewport resize listener + thresholds |
+>
+> ### Verification (end-to-end)
+>
+> 1. After each phase: Godot headless boot + Preview screenshot + console logs check. No `[x]` until all three are clean.
+> 2. Final: walk L1 (hover/click only) → L2 (place 1 deflector via palette) → L3 (place 2 deflectors with R rotate). Confirm:
+>    - Grid cell hover ring follows mouse during BUILD only
+>    - Emitter breathes idle, stops on RUN
+>    - Palette slides in, chip row appears
+>    - Cell flashes on placement
+>    - Selected slot has bright ring
+>    - Cursor reaches target → 8-shard burst + WinPanel + dim overlay
+>    - Force fail (place wrong, run) → red dwell → BUILD
+>    - Resize window to 900×600 → blocker covers screen
+> 3. Bundle: `gzip -c -9 build/index.wasm | wc -c` → still ~9.4 MB.
+> 4. DEVLOG Day 9 entry with `Verify:` citing 5 phase screenshots + final smoke.
+>
+> ### Out of scope (this pass)
+>
+> - New audio (sticking with procedural WAVs from Day 8).
+> - Drag-drop palette (click-to-place stays).
+> - HF MCP music swap.
+> - Cover image / screenshots / trailer (still human-assist).
+> - Sepolia contract deploy (still self-serve via README).
+>
+> ### Risks + mitigations
+>
+> - **Hover shader fires every frame** → poll only when phase = BUILD; clear coord on RUN. Negligible web perf cost.
+> - **Target burst lag on low-end mobile** → already 2D Polygon2D (not particles); cap shards to 8. DesktopOnlyBlocker covers mobile case anyway.
+> - **Palette fade delays first action** → 0.25 s cap; input not blocked during tween.
+> - **Fail breathe sluggish on retries** → 0.5 s dwell; click-to-skip handler.
+>
+> ---
+
+
 > ## 🚀 FAST-RESUME (read this first, every session)
 >
 > **Claude Code Desktop sessions should take <30 s to orient.** This block is the entire onboarding.
@@ -11,23 +109,21 @@
 > │ CURRENT STATE (update at EOD + mid-task checkpoints)│
 > ├─────────────────────────────────────────────────────┤
 > │ Today's date:          2026-04-17                   │
-> │ Current day:           Day 8 (post-v1.0 gap close)  │
-> │ Last completed:        All code gaps closed in one  │
-> │                        pass — audio, palette, undo, │
-> │                        keys, hint, shake, shrink,   │
-> │                        colorblind live, save toast  │
-> │ Next action:           HUMAN ASSIST only — contract │
-> │                        deploy, cover PNG, screens,  │
-> │                        trailer, itch upload, jam    │
-> │                        submit per SUBMISSION docs   │
-> │ In-progress (if any):  (none — code-complete)       │
-> │   └─ last file touched: DEVLOG.md                   │
-> │   └─ last test run:     Preview boot clean; PCK     │
-> │                        866 KB; wasm 36 MB (9.4 gz); │
-> │                        0 console errors             │
-> │ Blockers:              Claude Preview cannot persist│
-> │                        canvas PNG to disk           │
-> │ Last commit:            (pending Day 8 EOD)         │
+> │ Current day:           Day 9 — UI/UX polish pass    │
+> │ Last completed:        L2-L10 redesigned as palette │
+> │                        puzzles with walls (9662a53) │
+> │ Next action:           Execute UI/UX plan (Phase A  │
+> │                        affordance → C feedback →    │
+> │                        D palette → B hierarchy →    │
+> │                        E responsive → F verify)     │
+> │ In-progress (if any):  Plan written; awaiting       │
+> │                        ExitPlanMode approval        │
+> │   └─ last file touched: docs/PLAN.md                │
+> │   └─ last test run:     Preview L2 puzzle: cursors  │
+> │                        right→deflector→down→target  │
+> │ Blockers:              None for code; human-assist  │
+> │                        items still pending          │
+> │ Last commit:            9662a53                     │
 > │ Plan version:          v8 (7-day + Ethereum +       │
 > │                        gap audit + theme detail +   │
 > │                        source-of-truth +            │

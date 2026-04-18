@@ -24,6 +24,15 @@ const WALL_GREY := Color("#4A5060")
 # Colorblind-friendly substitute for amber.
 const EMITTER_AMBER_CB := Color("#2E7AE8")
 
+# Day 9 UI/UX additions — feedback / hierarchy / state colors.
+const FAIL_RED := Color("#F2534C")
+const WIN_GREEN := Color("#5BD87C")
+const HOVER_TINT := Color("#FFFFFF")            # multiplied at low alpha for cell hover ring
+const SELECTION_RING := Color("#E8A53A")        # palette slot selection (amber match)
+const OVERLAY_DIM := Color("#000000")           # used at ~55% alpha behind modals
+const MUTED_TEXT := Color("#8E9499")            # secondary HUD text
+const ACCENT := Color("#F2F0E9")                # cell-flash + generic highlights
+
 
 enum Swatch {
 	BG_DARK,
@@ -32,6 +41,13 @@ enum Swatch {
 	CURSOR_MAGENTA,
 	TARGET_CYAN,
 	WALL_GREY,
+	FAIL_RED,
+	WIN_GREEN,
+	HOVER_TINT,
+	SELECTION_RING,
+	OVERLAY_DIM,
+	MUTED_TEXT,
+	ACCENT,
 }
 
 
@@ -50,6 +66,21 @@ static func get_color(swatch: Swatch) -> Color:
 			return TARGET_CYAN
 		Swatch.WALL_GREY:
 			return WALL_GREY
+		Swatch.FAIL_RED:
+			return FAIL_RED
+		Swatch.WIN_GREEN:
+			return WIN_GREEN
+		Swatch.HOVER_TINT:
+			return HOVER_TINT
+		Swatch.SELECTION_RING:
+			# Selection ring matches amber, so swap on colorblind too.
+			return EMITTER_AMBER_CB if colorblind else SELECTION_RING
+		Swatch.OVERLAY_DIM:
+			return OVERLAY_DIM
+		Swatch.MUTED_TEXT:
+			return MUTED_TEXT
+		Swatch.ACCENT:
+			return ACCENT
 	return FG_LIGHT
 
 

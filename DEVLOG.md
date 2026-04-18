@@ -4,6 +4,35 @@ Daily journal for the 7-day jam sprint (Apr 16 → Apr 22, 2026). Two-to-five li
 
 ---
 
+## Day 9 — UI/UX polish pass — 2026-04-18
+
+User said "feels too easy / rough". Audit identified discoverability + feedback + hierarchy gaps. Closed in 6 phases over one session.
+
+- **D12 — AppPalette swatches.** `Swatch` enum extended: `FAIL_RED`, `WIN_GREEN`, `HOVER_TINT`, `SELECTION_RING`, `OVERLAY_DIM`, `MUTED_TEXT`, `ACCENT`. `get_color()` branches on each, with colorblind swap on amber/selection_ring. HUD FailBanner color migrated to match `FAIL_RED`.
+- **Phase A — Affordance.**
+  - A1 `shaders/grid_hover.gdshader` (canvas_item, GL Compatibility safe). New `HoverOverlay` ColorRect in `level.tscn` with the shader. `GridSystem._process` polls `get_global_mouse_position()` → cell coords → sets `hover_cell` uniform. Active only in BUILD; cleared on RUN/WIN/FAIL.
+  - A2 Emitter idle pulse — looping Tween (modulate.a 1.0↔0.85 + scale 1.0↔1.06 over 1.2 s, sine ease). Subscribes to PhaseController.phase_changed, pauses on RUN.
+  - A3 Palette fade-in on BUILD entry — Level._animate_palette_visibility tweens `modulate.a` 0→1 + `position.y` +16→origin over 0.25 s (TRANS_QUART). Mirror fade-out on phase exit.
+  - A4 Palette hint chip row — `PaletteHintRow` Label below palette: "1-7 select · click cell to place · R rotate · right-click remove · Z undo". Fades in 0.4 s after palette with 0.15 s delay.
+- **Phase C — Feedback.**
+  - C1 `Level._flash_cell(cell)` — TILE_SIZE Polygon2D ACCENT square, scale 1.0→1.25 + alpha 0.8→0 over 0.3 s. Fires on placement (palette + undo-restore paths).
+  - C2 `Target._celebrate_burst()` — 8 small triangles radiate outward 28 px + fade 0.5 s, WIN_GREEN tint. Pure Polygon2D (no GPUParticles2D) for GL Compatibility safety.
+  - C3 `Emitter._birth_flash()` — magenta 12-sided ring scales ×5 + fades 0.25 s on every cursor spawn. Player traces emit cadence visually.
+  - C4 `Level._play_fail_red_breathe()` — 0.6 s red modulate dwell on Level Node2D alongside existing screen shake. Doesn't block input.
+- **Phase B — Hierarchy.**
+  - B5 `WinDimOverlay` ColorRect added to HUD (full-rect black @ 55 % alpha). HUD.show_win fades dim in alongside WinPanel; hidden on retry / phase BUILD.
+  - B6 HintBanner moved from y=72 (overlapping TopBar title) to y=540 (above palette / mid-bottom). Font size 16→17.
+  - B7 PhaseLabel font 20→14, color → `MUTED_TEXT` so the level title dominates.
+- **Phase D — Palette polish.**
+  - D13 Selection ring — `_animate_slot_selection` tween scale 1.0→1.08 + modulate ×1.15 brightness on selected slot, reverse on deselect (0.12 s).
+  - D14 Number badges — each slot gets a top-right "1"…"7" Label (font 10, MUTED_TEXT) reinforcing `pw_part_N` shortcuts.
+- **Phase E — Responsive blocker.**
+  - DesktopOnlyBlocker gains `MIN_WIDTH=1100` / `MIN_HEIGHT=620` thresholds + `should_block()` static. `_ready` connects `get_tree().root.size_changed` and toggles visibility live on resize. MainMenu uses `should_block()` (was `is_mobile_device()` only).
+- Verify: Godot headless boot clean on main + level (0 SCRIPT ERROR / 0 Parse). Web re-exported — PCK 866 KB → 876 KB (+10 KB for new chip row + WinDim overlay), wasm unchanged at 36 MB raw / ~9.4 MB gzip. Claude Preview reload clean; main menu renders all 3 buttons + jam tag. Live resize test deferred (browser blocked window.resizeTo).
+- Bundle still well under 15 MB budget. No new asset files; only shader + Tween + Polygon2D.
+
+---
+
 ## Day 8 (post-v1.0 gap closure) — 2026-04-17
 
 User asked to close every code-gap. Done in one pass; all shipped.

@@ -35,9 +35,33 @@ func apply_to_cursor(_cursor: VirtualCursor) -> void:
 	hit.emit()
 	_disable_pulse()
 	_light_up()
+	_celebrate_burst()
 	var audio := get_node_or_null(^"/root/AudioBus")
 	if audio != null:
 		audio.call(&"play_sfx", &"hit_target")
+
+
+## C2 — 8 small triangles fly outward + fade. WIN_GREEN tint.
+## Pure Polygon2D (no GPUParticles2D) for GL Compatibility safety.
+func _celebrate_burst() -> void:
+	var burst_color := AppPalette.get_color(AppPalette.Swatch.WIN_GREEN)
+	for i in 8:
+		var ang := (float(i) / 8.0) * TAU
+		var dir := Vector2.RIGHT.rotated(ang)
+		var shard := Polygon2D.new()
+		shard.polygon = PackedVector2Array([
+			Vector2(0, -3), Vector2(6, 0), Vector2(0, 3),
+		])
+		shard.color = burst_color
+		shard.rotation = ang
+		add_child(shard)
+		shard.position = Vector2.ZERO
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(shard, "position", dir * 28.0, 0.5)
+		tween.tween_property(shard, "modulate:a", 0.0, 0.5)
+		tween.chain().tween_callback(shard.queue_free)
 
 
 func is_hit() -> bool:

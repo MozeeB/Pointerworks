@@ -86,7 +86,8 @@ func _build_ui() -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 8)
 	add_child(row)
-	for t in _types:
+	for slot_idx in _types.size():
+		var t: int = _types[slot_idx]
 		var meta: Array = SLOT_META.get(t, ["?", Color.WHITE])
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(SLOT_WIDTH, ROW_HEIGHT)
@@ -95,6 +96,15 @@ func _build_ui() -> void:
 		btn.text = _slot_label(int(t), meta[0])
 		btn.add_theme_color_override(&"font_color", meta[1])
 		btn.pressed.connect(_on_slot_pressed.bind(int(t)))
+		# D14 — number-key badge ("1"…"7"). Reinforces pw_part_N shortcut.
+		var badge := Label.new()
+		badge.text = str(slot_idx + 1)
+		badge.add_theme_color_override(&"font_color", AppPalette.get_color(AppPalette.Swatch.MUTED_TEXT))
+		badge.add_theme_font_size_override(&"font_size", 10)
+		badge.position = Vector2(SLOT_WIDTH - 14, 2)
+		badge.size = Vector2(12, 12)
+		badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		btn.add_child(badge)
 		row.add_child(btn)
 		_buttons[int(t)] = btn
 	_select_next_available()
@@ -122,7 +132,21 @@ func _select_slot(type_index: int) -> void:
 	for t in _buttons:
 		var btn: Button = _buttons[t]
 		btn.button_pressed = (t == type_index)
+		_animate_slot_selection(btn, t == type_index)
 	slot_selected.emit(type_index)
+
+
+## D13 — Tween brighter modulate + slight scale for selected slot.
+func _animate_slot_selection(btn: Button, selected_now: bool) -> void:
+	btn.pivot_offset = btn.size * 0.5
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	if selected_now:
+		tween.tween_property(btn, "scale", Vector2(1.08, 1.08), 0.12)
+		tween.parallel().tween_property(btn, "modulate", Color(1.15, 1.15, 1.15, 1), 0.12)
+	else:
+		tween.tween_property(btn, "scale", Vector2.ONE, 0.12)
+		tween.parallel().tween_property(btn, "modulate", Color(1, 1, 1, 1), 0.12)
 
 
 func _select_next_available() -> void:

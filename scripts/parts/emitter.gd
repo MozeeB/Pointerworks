@@ -14,6 +14,7 @@ signal cursor_spawned(cursor: VirtualCursor)
 
 var _mouse_over: bool = false
 var _cooldown: float = 0.0
+var _idle_tween: Tween = null
 
 
 func _ready() -> void:
@@ -29,6 +30,42 @@ func _ready() -> void:
 	var s := get_node_or_null(^"/root/Settings")
 	if s != null:
 		s.settings_changed.connect(_apply_palette)
+	# Subscribe to phase changes so we can pause idle pulse during RUN.
+	var phase_node := get_tree().root.find_child(&"PhaseController", true, false)
+	if phase_node != null and phase_node.has_signal(&"phase_changed"):
+		phase_node.phase_changed.connect(_on_phase_changed)
+	_start_idle_pulse()
+
+
+## Subtle breathing — modulate.a 0.85 ↔ 1.0 + scale 1.0 ↔ 1.06 over 1.2 s.
+## Cues "this thing is interactive" without screaming.
+func _start_idle_pulse() -> void:
+	if _idle_tween != null:
+		_idle_tween.kill()
+	_idle_tween = create_tween().set_loops()
+	_idle_tween.set_parallel(true)
+	_idle_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	_idle_tween.tween_property(self, "modulate:a", 0.85, 0.6)
+	_idle_tween.tween_property(self, "scale", Vector2(1.06, 1.06), 0.6)
+	_idle_tween.chain()
+	_idle_tween.tween_property(self, "modulate:a", 1.0, 0.6)
+	_idle_tween.tween_property(self, "scale", Vector2.ONE, 0.6)
+
+
+func _stop_idle_pulse() -> void:
+	if _idle_tween != null:
+		_idle_tween.kill()
+		_idle_tween = null
+	modulate.a = 1.0
+	scale = Vector2.ONE
+
+
+func _on_phase_changed(phase: int) -> void:
+	# Idle pulse only in BUILD; cursors take over visual energy in RUN.
+	if phase == 0:  # PhaseController.Phase.BUILD
+		_start_idle_pulse()
+	else:
+		_stop_idle_pulse()
 
 
 func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
@@ -94,9 +131,32 @@ func _spawn_cursor() -> void:
 	_cursor_container().add_child(cursor)
 	cursor.global_position = global_position
 	cursor_spawned.emit(cursor)
+	_birth_flash()
 	var audio := _audio_bus()
 	if audio != null:
 		audio.play_sfx(&"spawn")
+
+
+## C3 — small ring flash at the emitter when each cursor is born.
+## Magenta (cursor color) so player traces the spawn point easily.
+func _birth_flash() -> void:
+	var ring := Polygon2D.new()
+	# Approximate a ring with 12-sided polygon outline using a thin annulus.
+	var pts := PackedVector2Array()
+	for i in 12:
+		var a := (float(i) / 12.0) * TAU
+		pts.append(Vector2.RIGHT.rotated(a) * 4.0)
+	ring.polygon = pts
+	ring.color = AppPalette.get_color(AppPalette.Swatch.CURSOR_MAGENTA)
+	ring.modulate = Color(1, 1, 1, 1)
+	get_parent().add_child(ring)
+	ring.global_position = global_position
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(ring, "scale", Vector2(5.0, 5.0), 0.25)
+	tween.tween_property(ring, "modulate:a", 0.0, 0.25)
+	tween.chain().tween_callback(ring.queue_free)
 
 
 func _find_grid_system() -> GridSystem:

@@ -19,6 +19,7 @@ signal retry_pressed
 @onready var _back_btn: Button = $TopBar/BackButton
 @onready var _run_btn: Button = $RunBar/RunButton
 @onready var _win_panel: PanelContainer = $WinPanel
+@onready var _win_dim: ColorRect = $WinDimOverlay if has_node("WinDimOverlay") else null
 @onready var _win_title: Label = $WinPanel/VBox/Title
 @onready var _win_score: Label = $WinPanel/VBox/Score
 @onready var _next_btn: Button = $WinPanel/VBox/ButtonRow/NextButton
@@ -29,11 +30,16 @@ signal retry_pressed
 @onready var _onchain_btn: Button = $WinPanel/VBox/OnChainRow/OnChainButton if has_node("WinPanel/VBox/OnChainRow/OnChainButton") else null
 @onready var _onchain_status: Label = $WinPanel/VBox/OnChainRow/OnChainStatus if has_node("WinPanel/VBox/OnChainRow/OnChainStatus") else null
 @onready var _palette: Control = $PartPalette if has_node("PartPalette") else null
+@onready var _palette_hint_row: Label = $PaletteHintRow if has_node("PaletteHintRow") else null
 @onready var _hint_banner: Label = $HintBanner if has_node("HintBanner") else null
 
 
 func get_palette() -> Control:
 	return _palette
+
+
+func get_palette_hint_row() -> Label:
+	return _palette_hint_row
 
 
 func show_hint(text: String, duration: float = 4.0) -> void:
@@ -100,6 +106,7 @@ func set_phase(phase: int) -> void:
 			_phase_label.text = "BUILD"
 			_set_run_label(false)
 			_win_panel.hide()
+			_hide_win_dim_immediate()
 		PhaseController.Phase.RUN:
 			_phase_label.text = "RUN"
 			_set_run_label(true)
@@ -137,9 +144,19 @@ func show_win(cursors_used: int, par: int) -> void:
 	_win_title.text = _pick_win_copy()
 	var star: String = "⭐ " if cursors_used <= par else ""
 	_win_score.text = "%scursors: %d / par %d" % [star, cursors_used, par]
+	if _win_dim != null:
+		_win_dim.show()
+		_win_dim.modulate = Color(1, 1, 1, 0)
+		var dim_tween := create_tween()
+		dim_tween.tween_property(_win_dim, "modulate:a", 1.0, 0.2)
 	_win_panel.show()
 	var tween := create_tween()
 	tween.tween_property(_win_panel, "modulate:a", 1.0, 0.3)
+
+
+func _hide_win_dim_immediate() -> void:
+	if _win_dim != null:
+		_win_dim.hide()
 
 
 func _pick_win_copy() -> String:
@@ -175,6 +192,7 @@ func _play_button_press(btn: Control) -> void:
 func _on_retry() -> void:
 	_win_panel.modulate = Color(1, 1, 1, 0)
 	_win_panel.hide()
+	_hide_win_dim_immediate()
 	retry_pressed.emit()
 
 

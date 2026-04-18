@@ -49,6 +49,7 @@ func _load_level_by_id(id: String) -> LevelResource:
 @onready var _win: WinChecker = $WinChecker
 @onready var _fail: FailChecker = $FailChecker if has_node("FailChecker") else null
 @onready var _hud: CanvasLayer = $HUD
+@onready var _hover_overlay: ColorRect = $HoverOverlay if has_node("HoverOverlay") else null
 
 var _spawned_parts: Array[Part] = []
 
@@ -82,6 +83,11 @@ func _ready() -> void:
 		if pp != null and pp.locked:
 			_locked_cells[pp.cell] = true
 	_container.add_to_group(&"cursor_container")
+	# Hand the HoverOverlay material to the GridSystem so it can drive the
+	# hover-ring shader uniform from the OS mouse position. Active in BUILD.
+	if _hover_overlay != null and _hover_overlay.material is ShaderMaterial:
+		_grid.hover_material = _hover_overlay.material
+		_grid.set_hover_active(true)
 	_wire_hud()
 	_wire_phase()
 	_wire_emitters()
@@ -215,9 +221,66 @@ func _palette_node() -> Control:
 	return null
 
 
+func _animate_palette_visibility(phase: int) -> void:
+	var pal := _palette_node()
+	if pal == null or level_resource == null:
+		return
+	var hint_row: Label = null
+	if _hud != null and _hud.has_method(&"get_palette_hint_row"):
+		hint_row = _hud.call(&"get_palette_hint_row")
+	var should_show := (phase == PhaseController.Phase.BUILD) and not level_resource.palette_types.is_empty()
+	if should_show:
+		pal.visible = true
+		var origin_y := pal.position.y
+		pal.position.y = origin_y + 16
+		pal.modulate.a = 0.0
+		var tween := create_tween()
+		tween.set_parallel(true)
+		tween.set_trans(Tween.TRANS_QUART).set_ease(Tween.EASE_OUT)
+		tween.tween_property(pal, "modulate:a", 1.0, 0.25)
+		tween.tween_property(pal, "position:y", origin_y, 0.25)
+		if hint_row != null:
+			hint_row.visible = true
+			hint_row.modulate.a = 0.0
+			tween.tween_property(hint_row, "modulate:a", 1.0, 0.4).set_delay(0.15)
+	else:
+		var tween := create_tween()
+		tween.tween_property(pal, "modulate:a", 0.0, 0.15)
+		tween.tween_callback(func(): pal.visible = false)
+		if hint_row != null:
+			var t2 := create_tween()
+			t2.tween_property(hint_row, "modulate:a", 0.0, 0.15)
+			t2.tween_callback(func(): hint_row.visible = false)
+
+
 func _mouse_cell() -> Vector2i:
 	var world := _grid.get_global_mouse_position() - _grid.global_position
 	return _grid.world_to_cell(world)
+
+
+## C1 — visual flash on the cell where a part was just placed.
+## Spawns a TILE_SIZE Polygon2D, tweens scale 1.0 → 1.25 + alpha 0.8 → 0
+## over 0.3 s, then queue_free.
+func _flash_cell(cell: Vector2i) -> void:
+	if _grid == null:
+		return
+	var ts: float = float(GridSystem.TILE_SIZE)
+	var poly := Polygon2D.new()
+	var half := ts * 0.5
+	poly.polygon = PackedVector2Array([
+		Vector2(-half, -half), Vector2(half, -half),
+		Vector2(half, half), Vector2(-half, half),
+	])
+	poly.color = AppPalette.get_color(AppPalette.Swatch.ACCENT)
+	poly.modulate = Color(1, 1, 1, 0.8)
+	poly.global_position = _grid.global_position + _grid.cell_to_world(cell)
+	add_child(poly)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(poly, "scale", Vector2(1.25, 1.25), 0.3)
+	tween.tween_property(poly, "modulate:a", 0.0, 0.3)
+	tween.chain().tween_callback(poly.queue_free)
 
 
 func _try_place_at_mouse() -> bool:
@@ -251,6 +314,7 @@ func _try_place_at_mouse() -> bool:
 	_spawned_parts.append(part)
 	if part is Emitter:
 		(part as Emitter).cursor_spawned.connect(_on_cursor_spawned)
+	_flash_cell(cell)
 	_push_undo({&"op": &"place", &"cell": cell, &"type": type_index, &"rotation": 0, &"variant": 0})
 	return true
 
@@ -333,6 +397,7 @@ func _pop_undo() -> void:
 		_spawned_parts.append(part)
 		if part is Emitter:
 			(part as Emitter).cursor_spawned.connect(_on_cursor_spawned)
+		_flash_cell(cell)
 		if pal != null:
 			pal.call(&"consume", d.type)
 
@@ -392,9 +457,7 @@ func _on_cursor_spawned(_cursor: VirtualCursor) -> void:
 func _on_phase_changed(phase: int) -> void:
 	if _hud.has_method(&"set_phase"):
 		_hud.call(&"set_phase", phase)
-	var pal := _palette_node()
-	if pal != null and level_resource != null:
-		pal.visible = (phase == PhaseController.Phase.BUILD) and not level_resource.palette_types.is_empty()
+	_animate_palette_visibility(phase)
 	match phase:
 		PhaseController.Phase.BUILD:
 			_despawn_live_cursors()
@@ -402,18 +465,22 @@ func _on_phase_changed(phase: int) -> void:
 			_win.disarm()
 			if _fail != null:
 				_fail.disarm()
+			_grid.set_hover_active(true)
 		PhaseController.Phase.RUN:
 			_win.arm()
 			if _fail != null:
 				_fail.arm()
+			_grid.set_hover_active(false)
 		PhaseController.Phase.WIN:
 			_despawn_live_cursors()
 			if _fail != null:
 				_fail.disarm()
+			_grid.set_hover_active(false)
 		PhaseController.Phase.FAIL:
 			_despawn_live_cursors()
 			if _fail != null:
 				_fail.disarm()
+			_grid.set_hover_active(false)
 
 
 func _on_run_pressed() -> void:
@@ -451,9 +518,23 @@ func _on_level_failed(missed_targets: int) -> void:
 	if _hud.has_method(&"show_fail"):
 		_hud.call(&"show_fail", missed_targets)
 	_play_screen_shake()
+	_play_fail_red_breathe()
 	# Auto-return to BUILD after a brief fail banner.
 	var t := get_tree().create_timer(2.0)
 	t.timeout.connect(_auto_back_to_build)
+
+
+## C4 — short red modulate dwell so the fail registers visually.
+## 0.0 → 0.25 (red tint) → 0.0 over 0.6 s. Doesn't block input — pause/back
+## still respond, and screen shake runs in parallel.
+func _play_fail_red_breathe() -> void:
+	var red := AppPalette.get_color(AppPalette.Swatch.FAIL_RED)
+	var tinted := Color(red.r, red.g, red.b, 0.25)
+	var clear := Color(1, 1, 1, 1)
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_IN_OUT)
+	tween.tween_property(self, "modulate", clear.lerp(tinted, 1.0), 0.2)
+	tween.tween_property(self, "modulate", clear, 0.4)
 
 
 ## 4-kick screen shake (~0.4 s). Shifts Level.offset via Tween; no camera.

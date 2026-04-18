@@ -19,8 +19,32 @@ signal part_removed(cell: Vector2i, part: Node)
 var _cells: Dictionary = {}
 
 
+## Optional ShaderMaterial whose `hover_cell` uniform tracks mouse hover.
+## Wired by Level._ready by passing the HoverOverlay material here.
+var hover_material: ShaderMaterial = null
+var _hover_active: bool = false
+
+
 func _ready() -> void:
 	add_to_group(&"grid_system")
+	set_process(true)
+
+
+func set_hover_active(active: bool) -> void:
+	_hover_active = active
+	if not active and hover_material != null:
+		hover_material.set_shader_parameter(&"hover_cell", Vector2(-1, -1))
+
+
+func _process(_delta: float) -> void:
+	if not _hover_active or hover_material == null:
+		return
+	var world := get_global_mouse_position() - global_position
+	var cell := world_to_cell(world)
+	if not is_in_bounds(cell):
+		hover_material.set_shader_parameter(&"hover_cell", Vector2(-1, -1))
+		return
+	hover_material.set_shader_parameter(&"hover_cell", Vector2(cell.x, cell.y))
 
 
 func world_to_cell(world: Vector2) -> Vector2i:

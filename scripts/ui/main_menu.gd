@@ -73,7 +73,7 @@ func _refresh_wallet_label() -> void:
 func _check_mobile_blocker() -> bool:
 	# Import the class script so the static is reachable.
 	var scr := preload("res://scripts/ui/desktop_only_blocker.gd")
-	if scr != null and scr.is_mobile_device():
+	if scr != null and scr.should_block():
 		add_child(DESKTOP_BLOCKER_SCENE.instantiate())
 		return true
 	return false
