@@ -23,11 +23,24 @@ func _populate_grid() -> void:
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(128, 96)
 		btn.text = _button_label(id, i)
-		var unlocked := _is_unlocked(id) and i <= FIRST_AVAILABLE
+		# All 10 levels unlocked from launch — players can free-pick. Progress
+		# still tracks completion (⭐ on win), but sequential gating felt
+		# punishing in playtests. Re-enable sequential gating by ANDing
+		# `_is_unlocked(id)` here if the ladder feel is wanted post-jam.
+		var unlocked := i <= FIRST_AVAILABLE
 		btn.disabled = not unlocked
 		if unlocked:
-			btn.pressed.connect(func(): SceneSwitcher.to_level(id))
+			# `.bind(id)` snapshots the id String into the Callable args at
+			# this iteration. Without it, the lambda would close over the
+			# loop-scoped `id` variable by reference, and every button would
+			# load whatever id holds at click-time (typically the last
+			# iteration's value). This was the L1-loads-wrong-level bug.
+			btn.pressed.connect(_on_level_pressed.bind(id))
 		_grid.add_child(btn)
+
+
+func _on_level_pressed(level_id: String) -> void:
+	SceneSwitcher.to_level(level_id)
 
 
 func _button_label(id: String, n: int) -> String:
