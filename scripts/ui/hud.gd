@@ -29,13 +29,31 @@ signal retry_pressed
 @onready var _fail_label: Label = $FailBanner/Label if has_node("FailBanner/Label") else null
 @onready var _onchain_btn: Button = $WinPanel/VBox/OnChainRow/OnChainButton if has_node("WinPanel/VBox/OnChainRow/OnChainButton") else null
 @onready var _onchain_status: Label = $WinPanel/VBox/OnChainRow/OnChainStatus if has_node("WinPanel/VBox/OnChainRow/OnChainStatus") else null
+@onready var _targets_label: Label = $TopBar/StatsRow/TargetsLabel if has_node("TopBar/StatsRow/TargetsLabel") else null
+@onready var _cursors_label: Label = $TopBar/StatsRow/CursorsLabel if has_node("TopBar/StatsRow/CursorsLabel") else null
 @onready var _palette: Control = $PartPalette if has_node("PartPalette") else null
 @onready var _palette_hint_row: Label = $PaletteHintRow if has_node("PaletteHintRow") else null
-@onready var _hint_banner: Label = $HintBanner if has_node("HintBanner") else null
+@onready var _hint_banner: PanelContainer = $HintBanner if has_node("HintBanner") else null
+@onready var _hint_label: Label = $HintBanner/Label if has_node("HintBanner/Label") else null
 
 
 func get_palette() -> Control:
 	return _palette
+
+
+func _process(_delta: float) -> void:
+	# Cheap polling — HUD only exists during a level scene; counts are
+	# read directly from the scene-tree groups without signal plumbing.
+	if _targets_label != null:
+		var targets := get_tree().get_nodes_in_group(&"targets")
+		var hit := 0
+		for n in targets:
+			if n.has_method(&"is_hit") and n.call(&"is_hit"):
+				hit += 1
+		_targets_label.text = "🎯 %d / %d" % [hit, targets.size()]
+	if _cursors_label != null:
+		var live := get_tree().get_nodes_in_group(&"virtual_cursors").size()
+		_cursors_label.text = "↗ %d" % live
 
 
 func get_palette_hint_row() -> Label:
@@ -45,7 +63,8 @@ func get_palette_hint_row() -> Label:
 func show_hint(text: String, duration: float = 4.0) -> void:
 	if _hint_banner == null or text == "":
 		return
-	_hint_banner.text = text
+	if _hint_label != null:
+		_hint_label.text = text
 	_hint_banner.show()
 	_hint_banner.modulate = Color(1, 1, 1, 0)
 	var tween := create_tween()

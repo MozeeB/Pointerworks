@@ -27,5 +27,10 @@ void fragment() {
 	glow *= glow_strength;
 
 	vec3 color = mix(bg_color.rgb, line_color.rgb, max(line, glow));
-	COLOR = vec4(color, 1.0);
+	// Honour the ColorRect's incoming COLOR.a so a SubViewport behind the
+	// grid can peek through. Lines + glow stay fully opaque so they read.
+	float bg_alpha = COLOR.a;
+	float line_alpha = max(line, glow);
+	float final_alpha = max(bg_alpha, line_alpha);
+	COLOR = vec4(color, final_alpha);
 }
