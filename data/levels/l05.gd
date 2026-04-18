@@ -1,12 +1,13 @@
 extends RefCounted
-## L05 Lathe — accelerate for long runs (Speed Modifier ×2).
+## L05 Lathe — pre-laid speed mod (fast). Player adds deflectors.
 ##
-## Emitter → SpeedMod ×2 → target at the far side of the grid. Shows
-## how fast-mod shortens transit time across a big empty floor.
+## Pre-laid: emitter, fast speed mod inline, wall column, target above.
+## Palette: 2 Deflectors.
+## Solution: deflector (8,4) steps=2 RIGHT→UP, deflector (8,1) steps=0 UP→RIGHT.
 
 const ID := "l05"
 const DISPLAY_NAME := "Lathe"
-const HINT := "Speed modifiers scale velocity. Fast = ×2."
+const HINT := "Speed mod doubles velocity. Place deflectors to climb up + right."
 const PAR_CURSORS := 1
 
 
@@ -19,10 +20,14 @@ static func build() -> LevelResource:
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
 		_pl(Vector2i(1, 4), PartData.Type.EMITTER),
-		_pl(Vector2i(5, 4), PartData.Type.SPEED_MOD, 0, 1),  # variant 1 = fast ×2
-		_pl(Vector2i(14, 4), PartData.Type.TARGET),
+		_pl(Vector2i(4, 4), PartData.Type.SPEED_MOD, 0, 1),  # fast ×2 pre-laid
+		_pl(Vector2i(11, 4), PartData.Type.WALL),
+		_pl(Vector2i(11, 3), PartData.Type.WALL),
+		_pl(Vector2i(11, 5), PartData.Type.WALL),
+		_pl(Vector2i(14, 1), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	lvl.palette_types = [3]  # DEFLECTOR
+	lvl.palette_counts = [2]
 	return lvl
 
 

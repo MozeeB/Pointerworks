@@ -1,12 +1,14 @@
 extends RefCounted
-## L03 Forge — two targets in sequence.
+## L03 Forge — wall blocks straight line. Route around with 2 deflectors.
 ##
-## Emitter fires right; cursor passes through Target A, continues, hits
-## Target B. Introduces the idea that one cursor can light multiple targets.
+## Pre-laid: emitter, three-cell wall column, target on the far side.
+## Palette: 2 Deflectors.
+## Solution: deflector (3,4) [steps 0 → DOWN], deflector (3,7) [steps 2 → RIGHT].
+## Press R to rotate the second deflector twice (steps 0 → 1 → 2).
 
 const ID := "l03"
 const DISPLAY_NAME := "Forge"
-const HINT := "Cursors pass through targets; chain them in a line."
+const HINT := "Walls kill cursors. Route around. R rotates a placed part."
 const PAR_CURSORS := 1
 
 
@@ -19,10 +21,14 @@ static func build() -> LevelResource:
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
 		_pl(Vector2i(1, 4), PartData.Type.EMITTER),
-		_pl(Vector2i(7, 4), PartData.Type.TARGET),
-		_pl(Vector2i(14, 4), PartData.Type.TARGET),
+		# Three-cell wall blocks the y=4 row beyond x=5.
+		_pl(Vector2i(5, 3), PartData.Type.WALL),
+		_pl(Vector2i(5, 4), PartData.Type.WALL),
+		_pl(Vector2i(5, 5), PartData.Type.WALL),
+		_pl(Vector2i(10, 7), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	lvl.palette_types = [3]  # DEFLECTOR
+	lvl.palette_counts = [2]
 	return lvl
 
 

@@ -1,12 +1,14 @@
 extends RefCounted
-## L02 Press — introduce 90° routing via Deflector.
+## L02 Press — first puzzle. Player places one Deflector.
 ##
-## Emitter fires right; Deflector (steps=0 → +90° CW) redirects the
-## cursor DOWN into a Target below.
+## Pre-laid: emitter (1,4) + target (8,8).
+## Palette: 1 Deflector.
+## Solution: place deflector at (8,4). Click slot, click cell. Cursor
+## flies right, bends 90° down at the deflector, hits target.
 
 const ID := "l02"
 const DISPLAY_NAME := "Press"
-const HINT := "Deflectors turn cursors 90° clockwise."
+const HINT := "Click the deflector slot, then click cell (8,4) to place it."
 const PAR_CURSORS := 1
 
 
@@ -18,11 +20,12 @@ static func build() -> LevelResource:
 	lvl.par_cursors = PAR_CURSORS
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
-		_pl(Vector2i(1, 2), PartData.Type.EMITTER),
-		_pl(Vector2i(10, 2), PartData.Type.DEFLECTOR, 0),
-		_pl(Vector2i(10, 8), PartData.Type.TARGET),
+		_pl(Vector2i(1, 4), PartData.Type.EMITTER),
+		_pl(Vector2i(8, 8), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	# 3 = DEFLECTOR
+	lvl.palette_types = [3]
+	lvl.palette_counts = [1]
 	return lvl
 
 

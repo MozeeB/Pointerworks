@@ -1,12 +1,13 @@
 extends RefCounted
-## L06 Kiln — slow a cursor for tighter routing (Speed Modifier ×0.5).
+## L06 Kiln — pre-laid slow speed mod. Player routes around an L-wall.
 ##
-## Emitter → SpeedMod ×0.5 → Deflector → Target. A slower cursor leaves
-## thicker trails; easier to read complex machines later.
+## Pre-laid: emitter, slow speed mod inline, L-shaped wall, target below-right.
+## Palette: 2 Deflectors.
+## Solution: deflector (8,2) steps=0 RIGHT→DOWN, deflector (8,5) steps=2 DOWN→RIGHT.
 
 const ID := "l06"
 const DISPLAY_NAME := "Kiln"
-const HINT := "Slow modifier ×0.5. Trails stay longer on-screen."
+const HINT := "Slow mod halves speed. Two deflectors form an L-route to the target."
 const PAR_CURSORS := 1
 
 
@@ -19,11 +20,14 @@ static func build() -> LevelResource:
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
 		_pl(Vector2i(1, 2), PartData.Type.EMITTER),
-		_pl(Vector2i(5, 2), PartData.Type.SPEED_MOD, 0, 0),  # variant 0 = slow ×0.5
-		_pl(Vector2i(11, 2), PartData.Type.DEFLECTOR, 0),    # steps 0 → turn RIGHT→DOWN
-		_pl(Vector2i(11, 8), PartData.Type.TARGET),
+		_pl(Vector2i(4, 2), PartData.Type.SPEED_MOD, 0, 0),  # slow ×0.5 pre-laid
+		_pl(Vector2i(11, 2), PartData.Type.WALL),
+		_pl(Vector2i(11, 3), PartData.Type.WALL),
+		_pl(Vector2i(11, 4), PartData.Type.WALL),
+		_pl(Vector2i(14, 5), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	lvl.palette_types = [3]
+	lvl.palette_counts = [2]
 	return lvl
 
 

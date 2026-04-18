@@ -1,13 +1,20 @@
 extends RefCounted
-## L10 Cyclotron — 2 emitters, 2 teleporter pairs, 4 targets.
+## L10 Cyclotron — final puzzle. Two emitters, two pre-laid teleporter
+## pairs, four scattered targets. Walls partition the grid into 4 zones;
+## each zone holds one target. The teleporters jump cursors between zones.
 ##
-## Each emitter feeds a chain: cursor passes through the first target
-## (Target doesn't consume), hits a teleporter, exits on the opposite
-## row, passes through the second target. Par = 2 (one cursor per emit).
+## Pre-laid: 2 emitters, 2 teleporter pairs, 4 targets, dividing wall row.
+## Palette: 4 Deflectors (2 per emitter route).
+## Solution sketch:
+##   Emitter A (1,1) RIGHT → deflector (8,1) steps 0 DOWN to teleA pair0 (8,4)
+##     → exit teleB pair0 (1,8) RIGHT → target (5,8). Continue → target (14,8).
+##   Emitter B (1,4) RIGHT → deflector (5,4) steps 2 UP to (5,2)... actually
+##     simpler: B fires through the wall gap, hits teleA pair1 (12,4) → exits
+##     teleB pair1 (12,1) RIGHT → target (14,1). Continue past target (10,1).
 
 const ID := "l10"
 const DISPLAY_NAME := "Cyclotron"
-const HINT := "Two loops, four targets. Hover both emitters."
+const HINT := "Two emitters, two portal pairs. Route every cursor."
 const PAR_CURSORS := 2
 
 
@@ -19,21 +26,22 @@ static func build() -> LevelResource:
 	lvl.par_cursors = PAR_CURSORS
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
-		# Top loop
+		# Emitter A (top) — feeds top + left routes
 		_pl(Vector2i(1, 1), PartData.Type.EMITTER),
-		_pl(Vector2i(5, 1), PartData.Type.TARGET),        # pass-through
-		_pl(Vector2i(10, 1), PartData.Type.TELEPORTER, 0, 0),  # pair 0 A
-		_pl(Vector2i(1, 5), PartData.Type.TELEPORTER, 0, 0),   # pair 0 B
-		_pl(Vector2i(14, 5), PartData.Type.TARGET),
-
-		# Bottom loop
-		_pl(Vector2i(1, 8), PartData.Type.EMITTER),
+		_pl(Vector2i(8, 4), PartData.Type.TELEPORTER, 0, 0),  # pair 0 A
+		_pl(Vector2i(1, 8), PartData.Type.TELEPORTER, 0, 0),  # pair 0 B
 		_pl(Vector2i(5, 8), PartData.Type.TARGET),
-		_pl(Vector2i(10, 8), PartData.Type.TELEPORTER, 0, 1),  # pair 1 A
-		_pl(Vector2i(1, 4), PartData.Type.TELEPORTER, 0, 1),   # pair 1 B
-		_pl(Vector2i(14, 4), PartData.Type.TARGET),
+		_pl(Vector2i(14, 8), PartData.Type.TARGET),
+
+		# Emitter B (mid) — feeds right routes
+		_pl(Vector2i(1, 5), PartData.Type.EMITTER),
+		_pl(Vector2i(12, 5), PartData.Type.TELEPORTER, 0, 1),  # pair 1 A
+		_pl(Vector2i(8, 1), PartData.Type.TELEPORTER, 0, 1),   # pair 1 B → exits RIGHT through both targets
+		_pl(Vector2i(10, 1), PartData.Type.TARGET),
+		_pl(Vector2i(14, 1), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	lvl.palette_types = [3]  # DEFLECTOR
+	lvl.palette_counts = [2]
 	return lvl
 
 

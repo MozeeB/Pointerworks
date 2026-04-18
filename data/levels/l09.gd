@@ -1,12 +1,15 @@
 extends RefCounted
-## L09 Reactor — optimize: 4 targets, par enforces a tight cursor count.
+## L09 Reactor — 4 targets in 2 rows. Player adds 2 deflectors.
 ##
-## Splitter forks once; each branch deflects + slowed; 2 teleporter pairs
-## ferry the stream across a wall divider to hit 4 targets from a single emit.
+## Pre-laid: emitter, splitter, four targets in two rows.
+## Palette: 2 Deflectors (one per branch).
+## Solution: deflector (5,1) steps 0 UP→RIGHT, deflector (5,7) steps 2 DOWN→RIGHT.
+## Single cursor → splitter → both branches → deflectors → all 4 targets via
+## pass-through. Optimal par = 1 emit.
 
 const ID := "l09"
 const DISPLAY_NAME := "Reactor"
-const HINT := "Four targets. One cursor. Minimize waste."
+const HINT := "4 targets. One cursor through the splitter lights every row."
 const PAR_CURSORS := 1
 
 
@@ -19,22 +22,16 @@ static func build() -> LevelResource:
 	lvl.grid_size = Vector2i(16, 10)
 	lvl.placements = [
 		_pl(Vector2i(1, 4), PartData.Type.EMITTER),
-		_pl(Vector2i(4, 4), PartData.Type.SPLITTER),
-		# UP branch: goes up to deflector, turns right, hits target, then teleporter to lower-right for second target.
-		_pl(Vector2i(4, 1), PartData.Type.DEFLECTOR, 0),   # UP → RIGHT
-		_pl(Vector2i(8, 1), PartData.Type.TARGET),
-		_pl(Vector2i(14, 1), PartData.Type.TELEPORTER, 0, 0),  # pair 0 A
-		_pl(Vector2i(1, 7), PartData.Type.TELEPORTER, 0, 0),   # pair 0 B, exit still RIGHT
-		_pl(Vector2i(5, 7), PartData.Type.TARGET),
-		# DOWN branch: goes down to deflector, turns right, slow, hits target, teleports to top-right.
-		_pl(Vector2i(4, 7), PartData.Type.DEFLECTOR, 2),   # DOWN → RIGHT
-		_pl(Vector2i(7, 7), PartData.Type.SPEED_MOD, 0, 0),  # slow
+		_pl(Vector2i(5, 4), PartData.Type.SPLITTER),
+		# Top row
+		_pl(Vector2i(10, 1), PartData.Type.TARGET),
+		_pl(Vector2i(14, 1), PartData.Type.TARGET),
+		# Bottom row
 		_pl(Vector2i(10, 7), PartData.Type.TARGET),
-		_pl(Vector2i(14, 7), PartData.Type.TELEPORTER, 0, 1),  # pair 1 A
-		_pl(Vector2i(8, 4), PartData.Type.TELEPORTER, 0, 1),   # pair 1 B, exit RIGHT
-		_pl(Vector2i(13, 4), PartData.Type.TARGET),
+		_pl(Vector2i(14, 7), PartData.Type.TARGET),
 	]
-	lvl.palette_types = []
+	lvl.palette_types = [3]  # DEFLECTOR
+	lvl.palette_counts = [2]
 	return lvl
 
 
