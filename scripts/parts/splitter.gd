@@ -43,13 +43,13 @@ func apply_to_cursor(cursor: VirtualCursor) -> void:
 
 func _spawn_child(parent_node: Node, velocity: Vector2, grid_rect: Rect2) -> void:
 	var child := VIRTUAL_CURSOR_SCENE.instantiate() as VirtualCursor
-	# Offset slightly in the child's direction so it doesn't immediately
-	# re-overlap the splitter's Area2D (fork-bomb avoidance).
-	const SPAWN_OFFSET := 36.0  # just outside the 48×48 splitter shape
-	child.global_position = global_position + velocity.normalized() * SPAWN_OFFSET
 	child.velocity = velocity
 	child.grid_rect = grid_rect
+	# add_child BEFORE setting global_position so re-parenting doesn't
+	# offset the spawn point by the container transform.
 	parent_node.add_child(child)
+	const SPAWN_OFFSET := 36.0  # just outside the 48×48 splitter shape
+	child.global_position = global_position + velocity.normalized() * SPAWN_OFFSET
 
 
 func _enforce_global_cap() -> void:

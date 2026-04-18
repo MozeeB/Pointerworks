@@ -44,10 +44,10 @@ func apply_to_cursor(cursor: VirtualCursor) -> void:
 		return
 
 	var child := VIRTUAL_CURSOR_SCENE.instantiate() as VirtualCursor
-	child.global_position = exit.global_position + velocity.normalized() * SPAWN_OFFSET
 	child.velocity = velocity
 	child.grid_rect = grid_rect
 	parent_node.add_child(child)
+	child.global_position = exit.global_position + velocity.normalized() * SPAWN_OFFSET
 	var audio := get_node_or_null(^"/root/AudioBus")
 	if audio != null:
 		audio.call(&"play_sfx", &"deflect")

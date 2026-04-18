@@ -20,10 +20,25 @@ func _ready() -> void:
 	super()
 	mouse_entered.connect(_on_real_mouse_enter)
 	mouse_exited.connect(_on_real_mouse_exit)
+	# Also listen for direct input on the Area2D — clicking the emitter
+	# spawns a single cursor immediately. More discoverable than hover-only,
+	# and a hard backstop for any browser where Area2D mouse_entered is
+	# unreliable (some embedded webviews + automated test harnesses).
+	input_event.connect(_on_input_event)
 	_apply_palette()
 	var s := get_node_or_null(^"/root/Settings")
 	if s != null:
 		s.settings_changed.connect(_apply_palette)
+
+
+func _on_input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if mb.pressed and mb.button_index == MOUSE_BUTTON_LEFT:
+			_spawn_cursor()
+			# Also flip the hover state so subsequent hover keeps emitting.
+			_mouse_over = true
+			_cooldown = EMIT_COOLDOWN
 
 
 func _apply_palette() -> void:
@@ -66,7 +81,6 @@ func apply_to_cursor(_cursor: VirtualCursor) -> void:
 
 func _spawn_cursor() -> void:
 	var cursor := VIRTUAL_CURSOR_SCENE.instantiate() as VirtualCursor
-	cursor.global_position = global_position
 	cursor.velocity = direction_rotated(base_direction).normalized() * VirtualCursor.DEFAULT_SPEED
 	# Inherit the grid_rect of the nearest GridSystem, if any.
 	var grid := _find_grid_system()
@@ -74,7 +88,11 @@ func _spawn_cursor() -> void:
 		var gr := grid.get_grid_rect_world()
 		# Convert to world by adding the grid node's global position.
 		cursor.grid_rect = Rect2(grid.global_position + gr.position, gr.size)
+	# IMPORTANT: add_child BEFORE setting global_position. Otherwise the
+	# pre-parent assignment is treated as the local Vector2 and re-parenting
+	# under PartsContainer offsets the cursor by the container's transform.
 	_cursor_container().add_child(cursor)
+	cursor.global_position = global_position
 	cursor_spawned.emit(cursor)
 	var audio := _audio_bus()
 	if audio != null:
