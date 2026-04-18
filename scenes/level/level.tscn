@@ -13,10 +13,12 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_grid"]
 shader = ExtResource("6_gridglow")
 shader_parameter/bg_color = Color(0.0549, 0.0745, 0.1255, 1)
-shader_parameter/line_color = Color(0.18, 0.22, 0.32, 1)
+shader_parameter/line_color = Color(0.22, 0.27, 0.4, 1)
+shader_parameter/dot_color = Color(0.91, 0.65, 0.23, 1)
 shader_parameter/tile_size = 64.0
 shader_parameter/line_thickness = 1.0
-shader_parameter/glow_strength = 0.35
+shader_parameter/glow_strength = 0.4
+shader_parameter/dot_radius = 1.8
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_hover"]
 shader = ExtResource("8_gridhover")

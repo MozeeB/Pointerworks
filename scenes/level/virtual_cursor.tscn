@@ -1,13 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://dpointerworksvcursor"]
+[gd_scene load_steps=5 format=3 uid="uid://dpointerworksvcursor"]
 
 [ext_resource type="Script" path="res://scripts/level/virtual_cursor.gd" id="1_vcursor"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vcursor"]
-radius = 4.0
+radius = 5.0
 
 [sub_resource type="Gradient" id="Gradient_vcursor"]
+offsets = PackedFloat32Array(0, 0.6, 1)
+colors = PackedColorArray(1, 1, 1, 0, 0.851, 0.275, 0.702, 0.6, 1, 1, 1, 1)
+
+[sub_resource type="Gradient" id="Gradient_vcursor_glow"]
 offsets = PackedFloat32Array(0, 1)
-colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1)
+colors = PackedColorArray(1, 1, 1, 0, 0.851, 0.275, 0.702, 0.35)
 
 [node name="VirtualCursor" type="Area2D"]
 collision_layer = 2
@@ -17,12 +21,30 @@ script = ExtResource("1_vcursor")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_vcursor")
 
+[node name="ArrowOutline" type="Polygon2D" parent="."]
+color = Color(0.949, 0.941, 0.914, 1)
+polygon = PackedVector2Array(-11, -9, 14, 0, -11, 9, -6, 0)
+
 [node name="Arrow" type="Polygon2D" parent="."]
-color = Color(0.8509, 0.2745, 0.7019, 1)
-polygon = PackedVector2Array(-6, -5, 8, 0, -6, 5, -3, 0)
+color = Color(0.851, 0.275, 0.702, 1)
+polygon = PackedVector2Array(-9, -7, 12, 0, -9, 7, -4, 0)
+
+[node name="ArrowCore" type="Polygon2D" parent="."]
+color = Color(1, 0.85, 0.96, 1)
+polygon = PackedVector2Array(-4, -2.5, 7, 0, -4, 2.5, -2, 0)
+
+[node name="GlowTrail" type="Line2D" parent="."]
+width = 14.0
+default_color = Color(0.851, 0.275, 0.702, 1)
+gradient = SubResource("Gradient_vcursor_glow")
+joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2
 
 [node name="Trail" type="Line2D" parent="."]
-width = 3.0
-default_color = Color(0.8509, 0.2745, 0.7019, 1)
+width = 4.0
+default_color = Color(0.851, 0.275, 0.702, 1)
 gradient = SubResource("Gradient_vcursor")
 joint_mode = 2
+begin_cap_mode = 2
+end_cap_mode = 2

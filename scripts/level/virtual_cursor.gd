@@ -25,25 +25,26 @@ const TRAIL_MAX_POINTS := 60
 var _alive: bool = true
 
 @onready var _trail: Line2D = $Trail
+@onready var _glow_trail: Line2D = $GlowTrail if has_node("GlowTrail") else null
 
 
 func _ready() -> void:
 	add_to_group(&"virtual_cursors")
 	_trail.top_level = true
-	_trail.default_color = AppPalette.get_color(AppPalette.Swatch.CURSOR_MAGENTA)
-	_trail.width = 3.0
-	_trail.joint_mode = Line2D.LINE_JOINT_ROUND
-	# Gradient fades trail tail to transparent.
-	var grad := Gradient.new()
-	grad.add_point(0.0, Color(1, 1, 1, 0.0))
-	grad.add_point(1.0, Color(1, 1, 1, 1.0))
-	_trail.gradient = grad
+	if _glow_trail != null:
+		_glow_trail.top_level = true
+	# Orient the arrow polygon to face the velocity direction.
+	if velocity.length_squared() > 0.0:
+		rotation = velocity.angle()
 
 
 func _physics_process(delta: float) -> void:
 	if not _alive:
 		return
 	global_position += velocity * delta
+	# Keep arrow facing direction of travel after each Deflector turn.
+	if velocity.length_squared() > 0.0:
+		rotation = velocity.angle()
 	ttl -= delta
 	_append_trail_point(global_position)
 	if ttl <= 0.0:
@@ -56,6 +57,10 @@ func _append_trail_point(world_pt: Vector2) -> void:
 	_trail.add_point(world_pt)
 	if _trail.get_point_count() > TRAIL_MAX_POINTS:
 		_trail.remove_point(0)
+	if _glow_trail != null:
+		_glow_trail.add_point(world_pt)
+		if _glow_trail.get_point_count() > TRAIL_MAX_POINTS:
+			_glow_trail.remove_point(0)
 
 
 func die(cause: StringName) -> void:
