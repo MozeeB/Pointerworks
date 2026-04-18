@@ -79,6 +79,7 @@ docs/              — PLAN.md, ART.md, GAME_FLOW.md, cover.png, trailer.gif, sc
 - Browsers pause audio until first click; music starts on PlayButton press.
 - `user://save.cfg` on web is backed by localStorage — 5 MB hard cap (fine for us).
 - Web export must be the **non-threads** variant; threads require COOP/COEP and itch.io's SharedArrayBuffer toggle OFF.
+- **Mobile is supported** (Day 9f): tap = place, long-press (≥0.45 s, no drag) = remove. Right-click still removes for mouse users. Viewport blocker only fires on portrait or <720×480; landscape orientation enforced via `window/handheld/orientation=4` (sensor_landscape).
 
 ## Current sprint day
 

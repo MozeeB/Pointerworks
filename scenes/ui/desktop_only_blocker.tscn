@@ -22,7 +22,7 @@ theme_override_constants/separation = 18
 layout_mode = 2
 theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
 theme_override_font_sizes/font_size = 36
-text = "Desktop only"
+text = "Rotate to landscape"
 horizontal_alignment = 1
 
 [node name="Body1" type="Label" parent="VBox"]
@@ -30,7 +30,7 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9489, 0.9411, 0.9137, 1)
 theme_override_font_sizes/font_size = 18
 autowrap_mode = 3
-text = "Pointerworks runs on desktop mouse hardware."
+text = "Pointerworks runs in landscape orientation."
 horizontal_alignment = 1
 
 [node name="Body2" type="Label" parent="VBox"]
@@ -38,5 +38,5 @@ layout_mode = 2
 theme_override_colors/font_color = Color(0.9117, 0.6466, 0.2275, 1)
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
-text = "Please visit from a laptop or desktop browser."
+text = "Turn your device sideways to play (or resize the window to at least 720 × 480)."
 horizontal_alignment = 1

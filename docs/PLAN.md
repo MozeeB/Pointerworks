@@ -1,5 +1,35 @@
 # Pointerworks — Gamedev.js Jam 2026 (7-day sprint)
 
+> ## 📱 Day 9f — Mobile support (active, just landed)
+>
+> Pivot: previously **Desktop-only** by design (mouse-cursor-as-fuel was the
+> theme). User asked for mobile — done by leaning on the click/tap fallback
+> path that already existed on Emitters and adding long-press = remove for
+> touch parity with right-click.
+>
+> **Changes shipped:**
+>
+> | File | Change |
+> |---|---|
+> | `project.godot` | `window/stretch/aspect="keep"`, `window/handheld/orientation=4` (sensor_landscape), `[input_devices] pointing/emulate_mouse_from_touch=true` + `emulate_touch_from_mouse=false` |
+> | `scripts/ui/desktop_only_blocker.gd` | Dropped `is_mobile_device()` gate. New `should_block()` = `is_portrait() or is_viewport_too_small()`. MIN_WIDTH 1100 → **720**, MIN_HEIGHT 620 → **480**. Adds `_refresh_copy()` to switch banner between "Rotate to landscape" vs "Window too small". `is_mobile_device()` kept as no-op stub for back-compat with `main_menu.gd`. |
+> | `scenes/ui/desktop_only_blocker.tscn` | Banner copy: "Rotate to landscape" / "Pointerworks runs in landscape orientation." / "Turn your device sideways…" |
+> | `scripts/level/level.gd` | Added `LONG_PRESS_SEC=0.45` + `LONG_PRESS_TOLERANCE_PX=16.0`. Left-press starts a timer; release decides: short tap → place, long press without drag → remove. Right-click path still works for mouse users. |
+> | `scenes/ui/hud.tscn` | PaletteHintRow text: `1-7 select · tap to place · long-press / right-click to remove · R rotate · Z undo` |
+> | `CLAUDE.md` | Mobile-supported note in "Known dragons" |
+>
+> **What still needs follow-up (next pass, NOT shipped):**
+>
+> - Touch-friendly font sizes / hit-target widths in palette + HUD on small viewports (current sizes were tuned for 1280×720 desktop). Add a `is_touch_viewport` Settings flag → bump font_size + min_size on detection.
+> - Tutorial overlay text mentions "click" / "right-click" — should mention tap / long-press too. Update `scripts/ui/tutorial_overlay.gd` copy.
+> - Playtest on real iOS Safari + Android Chrome. Godot 4.6 web export typically renders fine but touch-device pixel-ratio sometimes mis-sizes the canvas — verify with `preview_resize` to ~414×896 + actual phone.
+> - SubViewportContainer 3D atmosphere may chew GPU on low-end mobile. If FPS drops, hide `Atmos3DContainer` when `OS.has_feature("mobile") or DisplayServer.window_get_size().x < 900`.
+> - `Settings.fullscreen` toggle is a no-op on iOS browsers (no fullscreen API for non-PWA). Hide the toggle when `OS.get_name() == "Web" and is_touch_viewport`.
+>
+> **Verify:** Godot headless `--quit-after 4 .` returns EXIT=0, no errors. Manual long-press test (mouse hold ≥0.45 s without moving) → cell removes. Manual tap (mouse click <0.45 s) → cell places. Real-mobile + Preview verification still pending.
+>
+> ---
+
 > ## 🎨 Day 9 — UI/UX Polish Plan (active)
 >
 > ### Context

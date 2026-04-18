@@ -21,6 +21,13 @@ const UNDO_MAX: int = 10
 var _undo: Array = []
 var _locked_cells: Dictionary = {}  # Vector2i → true (pre-laid parts cannot be removed)
 
+# Touch / mouse long-press tracking for mobile parity.
+# Tap = place, long-press (≥LONG_PRESS_SEC) without drag = remove.
+const LONG_PRESS_SEC: float = 0.45
+const LONG_PRESS_TOLERANCE_PX: float = 16.0
+var _press_time_sec: float = 0.0
+var _press_pos: Vector2 = Vector2.ZERO
+
 
 func _show_load_error(message: String) -> void:
 	var dlg := LEVEL_ERROR_SCENE.instantiate()
@@ -154,15 +161,31 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 			return
 	# Grid clicks for place/remove during BUILD.
+	# Mobile parity: left-press starts a timer; release decides:
+	#   short tap (<LONG_PRESS_SEC)  → place
+	#   long press (≥LONG_PRESS_SEC, didn't drag) → remove
+	# Right-click still removes immediately for mouse users.
 	if event is InputEventMouseButton:
 		var mb := event as InputEventMouseButton
-		if mb.pressed and _phase.is_build():
-			if mb.button_index == MOUSE_BUTTON_LEFT:
-				if _try_place_at_mouse():
-					get_viewport().set_input_as_handled()
-			elif mb.button_index == MOUSE_BUTTON_RIGHT:
-				if _try_remove_at_mouse():
-					get_viewport().set_input_as_handled()
+		if not _phase.is_build():
+			return
+		if mb.button_index == MOUSE_BUTTON_LEFT:
+			if mb.pressed:
+				_press_time_sec = Time.get_ticks_msec() / 1000.0
+				_press_pos = mb.position
+			else:
+				var dur: float = Time.get_ticks_msec() / 1000.0 - _press_time_sec
+				var moved: float = _press_pos.distance_to(mb.position)
+				if moved <= LONG_PRESS_TOLERANCE_PX:
+					if dur >= LONG_PRESS_SEC:
+						if _try_remove_at_mouse():
+							get_viewport().set_input_as_handled()
+					else:
+						if _try_place_at_mouse():
+							get_viewport().set_input_as_handled()
+		elif mb.pressed and mb.button_index == MOUSE_BUTTON_RIGHT:
+			if _try_remove_at_mouse():
+				get_viewport().set_input_as_handled()
 
 
 func _wire_hud() -> void:

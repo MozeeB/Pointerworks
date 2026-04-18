@@ -168,7 +168,7 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_colors/font_color = Color(0.557, 0.6, 0.66, 1)
 theme_override_font_sizes/font_size = 12
-text = "1-7 select  ·  click cell to place  ·  R rotate  ·  right-click remove  ·  Z undo"
+text = "1-7 select  ·  tap to place  ·  long-press / right-click to remove  ·  R rotate  ·  Z undo"
 horizontal_alignment = 1
 vertical_alignment = 1
 
