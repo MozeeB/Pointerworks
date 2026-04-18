@@ -258,6 +258,35 @@ func _mouse_cell() -> Vector2i:
 	return _grid.world_to_cell(world)
 
 
+## Place-fail feedback — red square flash on the offending cell.
+func _flash_cell_red(cell: Vector2i) -> void:
+	if _grid == null or not _grid.is_in_bounds(cell):
+		return
+	var ts: float = float(GridSystem.TILE_SIZE)
+	var poly := Polygon2D.new()
+	var half := ts * 0.5
+	poly.polygon = PackedVector2Array([
+		Vector2(-half, -half), Vector2(half, -half),
+		Vector2(half, half), Vector2(-half, half),
+	])
+	poly.color = AppPalette.get_color(AppPalette.Swatch.FAIL_RED)
+	poly.modulate = Color(1, 1, 1, 0.7)
+	poly.global_position = _grid.global_position + _grid.cell_to_world(cell)
+	add_child(poly)
+	var tween := create_tween()
+	tween.set_parallel(true)
+	tween.tween_property(poly, "modulate:a", 0.0, 0.4)
+	tween.tween_property(poly, "scale", Vector2(0.92, 0.92), 0.4)
+	tween.chain().tween_callback(poly.queue_free)
+
+
+## Hint banner shortcut for placement messages — reuses HUD.show_hint with
+## short duration so the message doesn't linger.
+func _show_place_feedback(text: String, _is_ok: bool) -> void:
+	if _hud != null and _hud.has_method(&"show_hint"):
+		_hud.call(&"show_hint", text, 1.5)
+
+
 ## C1 — visual flash on the cell where a part was just placed.
 ## Spawns a TILE_SIZE Polygon2D, tweens scale 1.0 → 1.25 + alpha 0.8 → 0
 ## over 0.3 s, then queue_free.
@@ -289,13 +318,18 @@ func _try_place_at_mouse() -> bool:
 		return false
 	var type_index: int = pal.call(&"selected")
 	if type_index < 0:
+		_show_place_feedback("Pick a part from the palette first.", false)
 		return false
 	var cell := _mouse_cell()
 	if not _grid.is_in_bounds(cell):
+		# Click outside grid — silent (probably user clicked HUD).
 		return false
 	if _grid.has_part(cell):
+		_flash_cell_red(cell)
+		_show_place_feedback("Cell occupied — pick an empty cell.", false)
 		return false
 	if not pal.call(&"consume", type_index):
+		_show_place_feedback("No more of that part — try another slot.", false)
 		return false
 	var d := PartData.new()
 	d.type = type_index
@@ -324,6 +358,8 @@ func _try_remove_at_mouse() -> bool:
 	if not _grid.has_part(cell):
 		return false
 	if _locked_cells.has(cell):
+		_flash_cell_red(cell)
+		_show_place_feedback("That part is locked — pre-laid by the level.", false)
 		return false  # pre-laid, not removable
 	var part_node: Node = _grid.get_part_at(cell)
 	if part_node == null:

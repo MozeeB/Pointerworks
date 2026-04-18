@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://dpointerworksatmos3d"]
+[gd_scene load_steps=14 format=3 uid="uid://dpointerworksatmos3d"]
 
 [ext_resource type="Script" path="res://scripts/fx/atmosphere_3d.gd" id="1_atmos"]
 
@@ -26,6 +26,25 @@ size = Vector3(6, 0.18, 0.18)
 
 [sub_resource type="BoxMesh" id="BoxMesh_frame"]
 size = Vector3(0.16, 4, 0.16)
+
+[sub_resource type="PrismMesh" id="PrismMesh_deflector"]
+left_to_right = 0.0
+size = Vector3(1.0, 1.2, 1.0)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_emitterCone"]
+top_radius = 0.0
+bottom_radius = 0.7
+height = 1.1
+radial_segments = 16
+
+[sub_resource type="TorusMesh" id="TorusMesh_target"]
+inner_radius = 0.45
+outer_radius = 0.7
+ring_segments = 24
+rings = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_speedmod"]
+size = Vector3(0.8, 0.18, 0.6)
 
 [sub_resource type="Environment" id="Environment_atmos"]
 background_mode = 1
@@ -70,3 +89,19 @@ mesh = SubResource("BoxMesh_beam")
 [node name="Frame" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, 0, -2.5)
 mesh = SubResource("BoxMesh_frame")
+
+[node name="DeflectorPrism" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.866, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866, 4.5, -0.6, -2.0)
+mesh = SubResource("PrismMesh_deflector")
+
+[node name="EmitterCone" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, -0.4, -1.8)
+mesh = SubResource("CylinderMesh_emitterCone")
+
+[node name="TargetRing" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 2.0, 1.6, -2.2)
+mesh = SubResource("TorusMesh_target")
+
+[node name="SpeedModBox" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, -1.8, -1.6)
+mesh = SubResource("BoxMesh_speedmod")

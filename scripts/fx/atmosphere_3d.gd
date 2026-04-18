@@ -17,6 +17,10 @@ const ROT_BEAM := 0.18
 @onready var _piston: MeshInstance3D = $Piston if has_node("Piston") else null
 @onready var _beam: MeshInstance3D = $Beam if has_node("Beam") else null
 @onready var _frame: MeshInstance3D = $Frame if has_node("Frame") else null
+@onready var _deflector: MeshInstance3D = $DeflectorPrism if has_node("DeflectorPrism") else null
+@onready var _emitter: MeshInstance3D = $EmitterCone if has_node("EmitterCone") else null
+@onready var _target_ring: MeshInstance3D = $TargetRing if has_node("TargetRing") else null
+@onready var _speedmod: MeshInstance3D = $SpeedModBox if has_node("SpeedModBox") else null
 
 var _t: float = 0.0
 
@@ -41,16 +45,29 @@ func _process(delta: float) -> void:
 		_beam.rotation.y += ROT_BEAM * delta
 	if _frame != null:
 		_frame.rotation.y += ROT_BEAM * 0.5 * delta
+	if _deflector != null:
+		_deflector.rotation.y += ROT_GEAR_LARGE * 0.6 * delta
+	if _emitter != null:
+		# Emitter cone slowly tilts left/right.
+		_emitter.rotation.z = 0.3 * sin(_t * 0.5)
+	if _target_ring != null:
+		_target_ring.rotation.x += ROT_BEAM * delta
+	if _speedmod != null:
+		_speedmod.position.x = -2.4 + 0.3 * sin(_t * 1.1)
 
 
 func _apply_palette() -> void:
 	# Re-tint mesh albedos when colorblind toggles. Each mesh keeps its
-	# baseline AppPalette swatch.
+	# baseline AppPalette swatch matched to the in-game part it suggests.
 	_set_albedo(_gear_large, AppPalette.Swatch.EMITTER_AMBER)
 	_set_albedo(_gear_small, AppPalette.Swatch.WALL_GREY)
 	_set_albedo(_piston, AppPalette.Swatch.CURSOR_MAGENTA)
 	_set_albedo(_beam, AppPalette.Swatch.TARGET_CYAN)
 	_set_albedo(_frame, AppPalette.Swatch.MUTED_TEXT)
+	_set_albedo(_deflector, AppPalette.Swatch.FG_LIGHT)        # in-game deflector tint
+	_set_albedo(_emitter, AppPalette.Swatch.EMITTER_AMBER)
+	_set_albedo(_target_ring, AppPalette.Swatch.TARGET_CYAN)
+	_set_albedo(_speedmod, AppPalette.Swatch.EMITTER_AMBER)
 
 
 func _set_albedo(mesh: MeshInstance3D, swatch: int) -> void:

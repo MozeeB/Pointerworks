@@ -20,6 +20,14 @@ static func build() -> LevelResource:
 	lvl.placements = [
 		_pl(Vector2i(1, 4), PartData.Type.EMITTER),
 		_pl(Vector2i(14, 4), PartData.Type.TARGET),
+		# Decorative walls — frame the conveyor like real factory rails.
+		# Off the cursor path (y=4), so the puzzle stays trivial.
+		_pl(Vector2i(4, 1), PartData.Type.WALL),
+		_pl(Vector2i(7, 1), PartData.Type.WALL),
+		_pl(Vector2i(10, 1), PartData.Type.WALL),
+		_pl(Vector2i(4, 7), PartData.Type.WALL),
+		_pl(Vector2i(7, 7), PartData.Type.WALL),
+		_pl(Vector2i(10, 7), PartData.Type.WALL),
 	]
 	lvl.palette_types = []  # pre-laid for L01
 	return lvl
