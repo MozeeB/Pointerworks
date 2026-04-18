@@ -1,6 +1,7 @@
-[gd_scene format=3 uid="uid://b3sl836xdhxga"]
+[gd_scene load_steps=2 format=3 uid="uid://b3sl836xdhxga"]
 
 [ext_resource type="Script" path="res://scripts/ui/credits.gd" id="1_credits"]
+[ext_resource type="PackedScene" uid="uid://dpointerworksatmos3d" path="res://scenes/fx/atmosphere_3d.tscn" id="2_atmos"]
 
 [node name="Credits" type="Control"]
 layout_mode = 3
@@ -11,6 +12,23 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_credits")
 
+[node name="Atmos3DContainer" type="SubViewportContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+
+[node name="SubViewport" type="SubViewport" parent="Atmos3DContainer"]
+handle_input_locally = false
+size = Vector2i(1280, 720)
+render_target_update_mode = 4
+
+[node name="Atmosphere3D" parent="Atmos3DContainer/SubViewport" instance=ExtResource("2_atmos")]
+
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -18,7 +36,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.0549, 0.0745, 0.1255, 1)
+mouse_filter = 2
+color = Color(0.0549, 0.0745, 0.1255, 0.55)
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 1

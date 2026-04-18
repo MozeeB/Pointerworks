@@ -1,0 +1,72 @@
+[gd_scene load_steps=10 format=3 uid="uid://dpointerworksatmos3d"]
+
+[ext_resource type="Script" path="res://scripts/fx/atmosphere_3d.gd" id="1_atmos"]
+
+[sub_resource type="TorusMesh" id="TorusMesh_gearLarge"]
+inner_radius = 1.4
+outer_radius = 2.2
+ring_segments = 16
+rings = 8
+
+[sub_resource type="TorusMesh" id="TorusMesh_gearSmall"]
+inner_radius = 0.6
+outer_radius = 1.0
+ring_segments = 16
+rings = 8
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_piston"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 1.6
+radial_segments = 12
+rings = 1
+
+[sub_resource type="BoxMesh" id="BoxMesh_beam"]
+size = Vector3(6, 0.18, 0.18)
+
+[sub_resource type="BoxMesh" id="BoxMesh_frame"]
+size = Vector3(0.16, 4, 0.16)
+
+[sub_resource type="Environment" id="Environment_atmos"]
+background_mode = 1
+background_color = Color(0.0549, 0.0745, 0.1255, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.55, 0.6, 0.78, 1)
+ambient_light_energy = 0.45
+
+[sub_resource type="CameraAttributesPractical" id="CameraAttributes_atmos"]
+
+[node name="Atmosphere3D" type="Node3D"]
+script = ExtResource("1_atmos")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.940, 0.342, 0, -0.342, 0.940, 0, 4, 9)
+attributes = SubResource("CameraAttributes_atmos")
+fov = 55.0
+
+[node name="WorldEnv" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_atmos")
+
+[node name="DirLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 6, 4)
+light_energy = 0.85
+
+[node name="GearLarge" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 1.2, -1.5)
+mesh = SubResource("TorusMesh_gearLarge")
+
+[node name="GearSmall" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 0.4, -1.0)
+mesh = SubResource("TorusMesh_gearSmall")
+
+[node name="Piston" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.6, 0.6, -1.2)
+mesh = SubResource("CylinderMesh_piston")
+
+[node name="Beam" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.4, -2.0)
+mesh = SubResource("BoxMesh_beam")
+
+[node name="Frame" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0, 0, -2.5)
+mesh = SubResource("BoxMesh_frame")
