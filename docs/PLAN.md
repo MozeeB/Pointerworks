@@ -1,5 +1,45 @@
 # Pointerworks — Gamedev.js Jam 2026 (7-day sprint)
 
+> ## 🔁 Day 9g — Win-bug fix + replayability hooks (active, just landed)
+>
+> **Two things in this push:**
+>
+> **A. "Hit target, level doesn't complete" bug (fixed)**
+>
+> - Root cause hypothesis: `Level._reset_targets()` only iterated `_spawned_parts`. Any Target not in that array (stale reference after a retry mid-frame, a target re-parented outside, a target whose `_hit=true` leaked from a prior run) stayed `_hit=true`, so `WinChecker._all_hit()` kept returning false forever.
+> - `Level._reset_targets()` now iterates `get_tree().get_nodes_in_group("targets")` — the canonical source of truth. Belt.
+> - `WinChecker.arm()` now force-resets every target's `_hit` flag at arm time, plus refuses to arm if the group is empty (prevents a ghost insta-win over an empty target list). Suspenders.
+>
+> **B. Replayability hooks**
+>
+> - **3-star tiered rating** in both WinDialog and LevelSelect:
+>   - ⭐⭐⭐ at or below par (perfect engineer)
+>   - ⭐⭐ within 1 cursor of par
+>   - ⭐ any completion
+> - **"🏆 new best!" stamp** in WinDialog when the player beats their previous cursors_used. Level passes the previous best to HUD BEFORE `Progress.mark_completed` overwrites it (new `set_prev_best_hint` method). When not a new best, shows `(best N)` next to the score for context.
+> - **Level select buttons** now show `best N / par N` under the ⭐s so players can see where there's still room to improve at a glance. `_par_for(id)` reads `PAR_CURSORS` via `GDScript.get_script_constant_map()` — cheap, cached.
+>
+> **Files touched:**
+>
+> | File | Change |
+> |---|---|
+> | `scripts/level/level.gd` | `_reset_targets` iterates targets group; `_on_level_complete` captures `prev_best` before `mark_completed` + forwards to HUD via `set_prev_best_hint` |
+> | `scripts/level/win_checker.gd` | `arm()` force-resets each target's `_hit`; refuses to arm on empty group |
+> | `scripts/ui/hud.gd` | `set_level_id`, `set_prev_best_hint`, 3-star logic + new-best stamp in `show_win` |
+> | `scripts/ui/level_select.gd` | `_par_for` helper; `_button_label` shows 3-star rating + `best N / par N` |
+>
+> **Next replayability passes (not shipped — candidates):**
+>
+> - Time-attack mode per level (optional toggle in Settings).
+> - Global leaderboard via Ethereum bitmap + cursor-count on Sepolia.
+> - "Challenge a friend" share link that encodes a custom grid state in URL.
+> - Daily seed (deterministic level variation).
+> - Unlock cosmetic cursor trail colors on ⭐⭐⭐ counts.
+>
+> **Verify:** Godot headless EXIT=0; no parse / warning. Manual play-through still pending; claim "hit target → win" fix is behavioral only and must be confirmed via Preview smoke + user real-device test.
+>
+> ---
+
 > ## 📱 Day 9f — Mobile support (active, just landed)
 >
 > Pivot: previously **Desktop-only** by design (mouse-cursor-as-fuel was the

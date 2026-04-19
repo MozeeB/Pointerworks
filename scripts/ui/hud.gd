@@ -114,9 +114,27 @@ func set_onchain_status(text: String) -> void:
 		_onchain_status.text = text
 
 
+var _level_id: String = ""
+var _prev_best_hint: int = -1
+
+
 func set_level_title(title: String) -> void:
 	if is_instance_valid(_title):
 		_title.text = title
+
+
+func set_level_id(id: String) -> void:
+	_level_id = id
+
+
+func set_prev_best_hint(prev_best: int) -> void:
+	# Level passes the best cursors_used BEFORE mark_completed overwrites it.
+	# Drives the "🏆 new best!" stamp in show_win.
+	_prev_best_hint = prev_best
+
+
+func _current_level_id_hint() -> String:
+	return _level_id
 
 
 func set_phase(phase: int) -> void:
@@ -161,8 +179,26 @@ const WIN_COPY_BY_LEVEL: Dictionary = {
 
 func show_win(cursors_used: int, par: int) -> void:
 	_win_title.text = _pick_win_copy()
-	var star: String = "⭐ " if cursors_used <= par else ""
-	_win_score.text = "%scursors: %d / par %d" % [star, cursors_used, par]
+	# Tiered rating gives players a reason to replay:
+	#   ⭐⭐⭐  = at or below par (perfect engineer)
+	#   ⭐⭐   = within 1 cursor of par
+	#   ⭐    = beat the level at all
+	var stars: String
+	if cursors_used <= par:
+		stars = "⭐⭐⭐"
+	elif cursors_used <= par + 1:
+		stars = "⭐⭐"
+	else:
+		stars = "⭐"
+	# Also show personal best + "new best!" stamp when applicable.
+	# Level sets _prev_best_hint BEFORE mark_completed so we see the real prev.
+	var best_text: String = ""
+	var prev_best: int = _prev_best_hint
+	if prev_best < 0 or cursors_used < prev_best:
+		best_text = "  🏆 new best!"
+	elif prev_best > 0:
+		best_text = "  (best %d)" % prev_best
+	_win_score.text = "%s  cursors: %d / par %d%s" % [stars, cursors_used, par, best_text]
 	if _win_dim != null:
 		_win_dim.show()
 		_win_dim.modulate = Color(1, 1, 1, 0)

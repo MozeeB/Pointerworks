@@ -191,6 +191,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func _wire_hud() -> void:
 	if _hud.has_method(&"set_level_title"):
 		_hud.call(&"set_level_title", level_resource.display_name)
+	if _hud.has_method(&"set_level_id"):
+		_hud.call(&"set_level_id", level_resource.id)
 	if _hud.has_method(&"show_hint") and level_resource.hint != "":
 		_hud.call(&"show_hint", level_resource.hint, 5.0)
 	if _hud.has_signal(&"run_pressed"):
@@ -618,8 +620,15 @@ func _auto_back_to_build() -> void:
 func _on_level_complete(cursors_used: int) -> void:
 	_phase.to_win()
 	var progress := get_node_or_null(^"/root/Progress")
+	# Capture previous best BEFORE mark_completed overwrites it — lets the
+	# HUD show a "🏆 new best!" stamp when applicable.
+	var prev_best: int = -1
+	if progress != null and progress.has_method(&"cursors_used_for"):
+		prev_best = int(progress.call(&"cursors_used_for", level_resource.id))
 	if progress != null and progress.has_method(&"mark_completed"):
 		progress.call(&"mark_completed", level_resource.id, cursors_used)
+	if _hud.has_method(&"set_prev_best_hint"):
+		_hud.call(&"set_prev_best_hint", prev_best)
 	if _hud.has_method(&"show_win"):
 		_hud.call(&"show_win", cursors_used, level_resource.par_cursors)
 	var audio := get_node_or_null(^"/root/AudioBus")
@@ -637,6 +646,12 @@ func _despawn_live_cursors() -> void:
 
 func _reset_targets() -> void:
 	# Idempotent reset — flips each Target's _hit state without tree churn.
-	for p in _spawned_parts:
-		if is_instance_valid(p) and p is Target:
-			(p as Target).reset()
+	# Uses the `targets` group as source of truth (covers targets placed from
+	# the palette mid-session as well as pre-laid ones — previously we only
+	# iterated `_spawned_parts`, which caused a stuck _hit=true state if a
+	# target got added/removed outside the array. That manifested as "hit
+	# the target but level never completes".
+	for n in get_tree().get_nodes_in_group(&"targets"):
+		var t := n as Target
+		if is_instance_valid(t):
+			t.reset()

@@ -44,14 +44,42 @@ func _on_level_pressed(level_id: String) -> void:
 
 
 func _button_label(id: String, n: int) -> String:
+	# Label grid button with lvl# + ⭐ rating + best-cursor count so the
+	# player sees at a glance where there's still room to improve. The
+	# 3-star tiered rating matches the WinDialog and gives replay value.
 	var progress := get_node_or_null(^"/root/Progress")
-	var star := ""
+	var stars := ""
+	var best_line := ""
 	if progress != null and progress.has_method(&"is_completed") and progress.call(&"is_completed", id):
-		star = " ⭐"
+		var par := _par_for(id)
+		var best: int = int(progress.call(&"cursors_used_for", id)) if progress.has_method(&"cursors_used_for") else -1
+		if best > 0 and par > 0:
+			if best <= par:
+				stars = " ⭐⭐⭐"
+			elif best <= par + 1:
+				stars = " ⭐⭐"
+			else:
+				stars = " ⭐"
+			best_line = "\nbest %d / par %d" % [best, par]
+		else:
+			stars = " ⭐"
 	var lock := ""
 	if n > FIRST_AVAILABLE:
 		lock = " 🔒"
-	return "%d%s%s" % [n, star, lock]
+	return "%d%s%s%s" % [n, stars, lock, best_line]
+
+
+func _par_for(id: String) -> int:
+	# Load the level GDScript and read its PAR_CURSORS constant. Cheap —
+	# GDScripts are small + cached after first load.
+	var path := "res://data/levels/%s.gd" % id
+	if not ResourceLoader.exists(path):
+		return -1
+	var scr: GDScript = load(path)
+	if scr == null:
+		return -1
+	var consts: Dictionary = scr.get_script_constant_map()
+	return int(consts.get("PAR_CURSORS", -1))
 
 
 func _is_unlocked(id: String) -> bool:
