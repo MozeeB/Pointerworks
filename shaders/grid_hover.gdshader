@@ -16,6 +16,9 @@ uniform float tile_size : hint_range(8.0, 256.0) = 64.0;
 uniform vec4 ring_color : source_color = vec4(0.91, 0.65, 0.23, 1.0);
 uniform float ring_thickness : hint_range(0.5, 6.0) = 2.0;
 uniform vec2 grid_origin = vec2(128.0, 56.0);  // matches Level Grid node global pos
+// canvas_size must match the logical viewport (default 1280×720).
+// Using UV * canvas_size instead of FRAGCOORD avoids HiDPI scale mismatches.
+uniform vec2 canvas_size = vec2(1280.0, 720.0);
 
 void fragment() {
 	if (hover_cell.x < 0.0) {
@@ -24,7 +27,9 @@ void fragment() {
 	}
 	vec2 cell_min = grid_origin + hover_cell * tile_size;
 	vec2 cell_max = cell_min + vec2(tile_size);
-	vec2 pix = FRAGCOORD.xy;
+	// UV gives 0-1 over the ColorRect's logical extent; multiply by canvas_size
+	// to get logical pixel coordinates, which match the grid's logical space.
+	vec2 pix = UV * canvas_size;
 
 	// Outside cell rect → fully transparent.
 	if (pix.x < cell_min.x || pix.x > cell_max.x || pix.y < cell_min.y || pix.y > cell_max.y) {

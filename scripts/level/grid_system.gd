@@ -32,13 +32,20 @@ func _ready() -> void:
 
 func set_hover_active(active: bool) -> void:
 	_hover_active = active
-	if not active and hover_material != null:
-		hover_material.set_shader_parameter(&"hover_cell", Vector2(-1, -1))
+	if hover_material != null:
+		# Sync grid_origin so the shader always tracks the actual node position.
+		# Do this both on activate and deactivate to catch any deferred-position
+		# setups (e.g. the node moves after _ready).
+		hover_material.set_shader_parameter(&"grid_origin", Vector2(global_position))
+		if not active:
+			hover_material.set_shader_parameter(&"hover_cell", Vector2(-1, -1))
 
 
 func _process(_delta: float) -> void:
 	if not _hover_active or hover_material == null:
 		return
+	# Keep grid_origin in sync with the node's actual canvas position each frame.
+	hover_material.set_shader_parameter(&"grid_origin", Vector2(global_position))
 	var world := get_global_mouse_position() - global_position
 	var cell := world_to_cell(world)
 	if not is_in_bounds(cell):
